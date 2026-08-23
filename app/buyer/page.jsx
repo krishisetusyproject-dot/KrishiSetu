@@ -8,6 +8,8 @@ export default function BuyerPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("Buyer");
+  const [listings, setListings] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     async function loadBuyer() {
@@ -19,18 +21,29 @@ export default function BuyerPage() {
         return;
       }
 
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("full_name, role")
-        .eq("id", userData.user.id)
+        .eq("profile_id", userData.user.id)
         .single();
 
-      if (profile?.role !== "buyer") {
+      if (profileError || profile?.role !== "buyer") {
         router.replace(profile?.role === "farmer" ? "/farmer" : "/login");
         return;
       }
 
       setName(profile.full_name || "Buyer");
+      const { data: activeListings, error: listingsError } = await supabase
+        .from("listings")
+        .select("id, title, category, asking_price, quantity_available, unit, quality_grade, location, description")
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
+
+      if (listingsError) {
+        setErrorMessage("Listings could not be loaded. Please check that the latest database migration is applied.");
+      } else {
+        setListings(activeListings || []);
+      }
       setLoading(false);
     }
 
@@ -57,7 +70,38 @@ export default function BuyerPage() {
         <section className="mt-10 rounded-[2rem] bg-emerald-950 p-8 text-amber-100 shadow-sm sm:p-12">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-100/70">Buyer account</p>
           <h1 className="mt-4 text-3xl font-bold">Welcome, {name}</h1>
-          <p className="mt-3 max-w-xl text-amber-100/80">Your buyer account is ready. Produce discovery and purchasing features will be added next.</p>
+          <p className="mt-3 max-w-xl text-amber-100/80">Find produce directly from farmers, compare asking prices, and plan your next procurement.</p>
+        </section>
+        <section className="mt-8">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-800">Marketplace</p>
+              <h2 className="mt-2 text-2xl font-bold text-emerald-950">Fresh listings</h2>
+            </div>
+            <span className="text-sm text-slate-500">{listings.length} available</span>
+          </div>
+          {errorMessage && <p className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">{errorMessage}</p>}
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            {listings.map((listing) => (
+              <article key={listing.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">{listing.category}</p>
+                    <h3 className="mt-2 text-xl font-bold text-emerald-950">{listing.title}</h3>
+                  </div>
+                  <p className="text-lg font-bold text-emerald-950">Rs. {listing.asking_price}<span className="text-xs font-normal text-slate-500"> / {listing.unit}</span></p>
+                </div>
+                <p className="mt-4 text-sm text-slate-600">{listing.description || "Direct from the farmer."}</p>
+                <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold text-slate-600">
+                  <span className="rounded-full bg-emerald-50 px-3 py-1">{listing.quantity_available} {listing.unit} available</span>
+                  <span className="rounded-full bg-amber-50 px-3 py-1">{listing.quality_grade || "Grade pending"}</span>
+                  <span className="rounded-full bg-slate-100 px-3 py-1">{listing.location}</span>
+                </div>
+                <button type="button" className="mt-5 w-full rounded-xl bg-emerald-950 px-4 py-3 text-sm font-semibold text-amber-100">Make an offer</button>
+              </article>
+            ))}
+          </div>
+          {!loading && !errorMessage && listings.length === 0 && <p className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-600">No active produce listings yet.</p>}
         </section>
       </div>
     </main>

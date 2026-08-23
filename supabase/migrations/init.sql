@@ -73,6 +73,11 @@ CREATE TABLE IF NOT EXISTS public.market_prices (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- Repair columns when these tables already existed before this migration.
+ALTER TABLE public.offers
+    ADD COLUMN IF NOT EXISTS listing_id UUID REFERENCES public.listings(id) ON DELETE CASCADE,
+    ADD COLUMN IF NOT EXISTS buyer_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE;
+
 -- ROW LEVEL SECURITY (RLS) POLICIES
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.listings ENABLE ROW LEVEL SECURITY;
@@ -81,19 +86,31 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.market_prices ENABLE ROW LEVEL SECURITY;
 
 -- Profiles Policies
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
 CREATE POLICY "Public profiles are viewable by everyone" ON public.profiles FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
 -- Listings Policies
+DROP POLICY IF EXISTS "Active listings are viewable by everyone" ON public.listings;
 CREATE POLICY "Active listings are viewable by everyone" ON public.listings FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Farmers can create listings" ON public.listings;
 CREATE POLICY "Farmers can create listings" ON public.listings FOR INSERT WITH CHECK (auth.uid() = farmer_id);
+DROP POLICY IF EXISTS "Farmers can update own listings" ON public.listings;
 CREATE POLICY "Farmers can update own listings" ON public.listings FOR UPDATE USING (auth.uid() = farmer_id);
 
 -- Offers Policies
+DROP POLICY IF EXISTS "Buyers and farmers can view related offers" ON public.offers;
 CREATE POLICY "Buyers and farmers can view related offers" ON public.offers FOR SELECT USING (
-    auth.uid() = buyer_id OR auth.uid() IN (SELECT farmer_id FROM public.listings WHERE id = listing_id)
+    auth.uid() = buyer_id OR listing_id IN (
+        SELECT l.id
+        FROM public.listings AS l
+        WHERE l.farmer_id = auth.uid()
+    )
 );
+DROP POLICY IF EXISTS "Buyers can create offers" ON public.offers;
 CREATE POLICY "Buyers can create offers" ON public.offers FOR INSERT WITH CHECK (auth.uid() = buyer_id);
 
 -- Market Prices Policies
+DROP POLICY IF EXISTS "Market prices are viewable by everyone" ON public.market_prices;
 CREATE POLICY "Market prices are viewable by everyone" ON public.market_prices FOR SELECT USING (true);

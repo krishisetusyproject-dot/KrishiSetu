@@ -49,13 +49,33 @@ export default function LoginPage() {
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")
-      .eq("id", data.user.id)
+      .eq("profile_id", data.user.id)
       .single();
 
     if (profileError || !profile?.role) {
-      console.error("Supabase profile lookup error:", profileError);
-      setErrorMessage("We could not find your account profile. Please run the latest Supabase migration and try again.");
-      setLoading(false);
+      const metadata = data.user.user_metadata || {};
+      const role = metadata.role === "buyer" ? "buyer" : "farmer";
+      const { error: createProfileError } = await supabase.from("profiles").upsert({
+        profile_id: data.user.id,
+        full_name: metadata.full_name || "KrishiSetu user",
+        email: data.user.email,
+        phone: metadata.phone || null,
+        role,
+        village: metadata.village || null,
+        city: metadata.city || null,
+        district: metadata.district || null,
+        state: metadata.state || null,
+        pincode: metadata.pincode || null,
+      });
+
+      if (createProfileError) {
+        console.error("Supabase profile lookup and creation error:", profileError, createProfileError);
+        setErrorMessage(`Profile setup failed: ${createProfileError.message}`);
+        setLoading(false);
+        return;
+      }
+
+      router.replace(role === "farmer" ? "/farmer" : "/buyer");
       return;
     }
 

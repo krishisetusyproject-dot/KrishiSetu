@@ -64,7 +64,7 @@ export default function RegisterPage() {
 
     setLoading(true);
     const supabase = createClient();
-    const { password, confirmPassword, ...profileMetadata } = form;
+    const { password, confirmPassword, fullName, ...profileFields } = form;
     let data;
     let error;
 
@@ -72,7 +72,13 @@ export default function RegisterPage() {
       ({ data, error } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
-        options: { data: { ...profileMetadata, role: selectedRole } },
+        options: {
+          data: {
+            ...profileFields,
+            full_name: fullName,
+            role: selectedRole,
+          },
+        },
       }));
     } catch (requestError) {
       console.error("Supabase sign-up request error:", requestError);
@@ -84,12 +90,15 @@ export default function RegisterPage() {
     if (error) {
       console.error("Supabase sign-up error:", error);
       const message = error.message.toLowerCase();
+      const detail = [error.message, error.code, error.hint].filter(Boolean).join(" ");
       setErrorMessage(
         message.includes("already registered") || message.includes("already been registered")
           ? "This email is already registered. Please sign in instead."
           : message.includes("password")
             ? "Your password must be at least 6 characters long."
-            : "We could not create your account. Check your email and password and try again."
+            : message.includes("database error saving new user")
+              ? "Supabase could not save the new user. Run supabase/migrations/farmer_auth.sql in your Supabase SQL Editor."
+              : detail
       );
       setLoading(false);
       return;
@@ -97,7 +106,7 @@ export default function RegisterPage() {
 
     if (data.session && data.user) {
       const { error: profileError } = await supabase.from("profiles").upsert({
-        id: data.user.id,
+        profile_id: data.user.id,
         full_name: form.fullName,
         email: form.email,
         phone: form.phone,
@@ -111,7 +120,7 @@ export default function RegisterPage() {
 
       if (profileError) {
         console.error("Supabase profile error:", profileError);
-        setErrorMessage("Your account was created, but your profile could not be saved. Please run the latest Supabase migration and try signing in.");
+        setErrorMessage("Your account was created, but the profile could not be saved. Run supabase/migrations/farmer_auth.sql in your Supabase SQL Editor, then sign in again.");
         setLoading(false);
         return;
       }
