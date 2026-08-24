@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
+import { getAllProfilesForAdmin, updateVerificationStatus } from "@/lib/services/profiles";
 import { Eye, CheckCircle, XCircle, FileText, AlertCircle, X } from "lucide-react";
 
 export default function UserVerificationPage() {
@@ -18,11 +19,11 @@ export default function UserVerificationPage() {
     async function fetchUsers() {
       try {
         setLoading(true);
-        const { data, error } = await supabase.from("profiles").select("*");
-        if (error) console.error("Error fetching users:", error.message);
-        else setUsers(data || []);
+        const supabase = createClient();
+        const data = await getAllProfilesForAdmin(supabase);
+        setUsers(data);
       } catch (err) {
-        console.error("Unexpected error:", err);
+        console.error("Unexpected error fetching profiles:", err);
       } finally {
         setLoading(false);
       }
@@ -32,17 +33,15 @@ export default function UserVerificationPage() {
 
   // Action 1: Approve Application
   const handleApprove = async (userId) => {
-    // Calling backend / API update
-    const { error } = await supabase
-      .from("profiles")
-      .update({ verification_status: "verified" })
-      .eq("id", userId);
-
-    if (!error) {
+    try {
+      const supabase = createClient();
+      await updateVerificationStatus(supabase, userId, "verified");
       setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, verification_status: "verified" } : u))
+        prev.map((u) => (u.id === userId || u.profile_id === userId ? { ...u, verification_status: "verified" } : u))
       );
-      if (selectedUser?.id === userId) setSelectedUser(null);
+      if (selectedUser?.id === userId || selectedUser?.profile_id === userId) setSelectedUser(null);
+    } catch (error) {
+      console.error("Error approving profile:", error);
     }
   };
 
@@ -51,19 +50,13 @@ export default function UserVerificationPage() {
     e.preventDefault();
     if (!rejectingUser) return;
 
-    // Connects to Rishabh's backend / API or directly updates Supabase
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        verification_status: "rejected",
-        rejection_reason: rejectionReason,
-      })
-      .eq("id", rejectingUser.id);
-
-    if (!error) {
+    try {
+      const supabase = createClient();
+      const targetId = rejectingUser.id || rejectingUser.profile_id;
+      await updateVerificationStatus(supabase, targetId, "rejected", rejectionReason);
       setUsers((prev) =>
         prev.map((u) =>
-          u.id === rejectingUser.id
+          u.id === targetId || u.profile_id === targetId
             ? { ...u, verification_status: "rejected", rejection_reason: rejectionReason }
             : u
         )
@@ -71,6 +64,8 @@ export default function UserVerificationPage() {
       setRejectingUser(null);
       setRejectionReason("");
       setSelectedUser(null);
+    } catch (error) {
+      console.error("Error rejecting profile:", error);
     }
   };
 

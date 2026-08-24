@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getUserProfile } from "@/lib/services/profiles";
+import { getActiveListings } from "@/lib/services/listings";
 
 export default function BuyerPage() {
   const router = useRouter();
@@ -21,30 +23,22 @@ export default function BuyerPage() {
         return;
       }
 
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("full_name, role")
-        .eq("profile_id", userData.user.id)
-        .single();
+      try {
+        const profile = await getUserProfile(supabase, userData.user.id);
+        if (!profile || profile.role !== "buyer") {
+          router.replace(profile?.role === "farmer" ? "/farmer" : "/login");
+          return;
+        }
 
-      if (profileError || profile?.role !== "buyer") {
-        router.replace(profile?.role === "farmer" ? "/farmer" : "/login");
-        return;
-      }
-
-      setName(profile.full_name || "Buyer");
-      const { data: activeListings, error: listingsError } = await supabase
-        .from("listings")
-        .select("id, title, category, asking_price, quantity_available, unit, quality_grade, location, description")
-        .eq("status", "active")
-        .order("created_at", { ascending: false });
-
-      if (listingsError) {
+        setName(profile.full_name || "Buyer");
+        const activeListings = await getActiveListings(supabase);
+        setListings(activeListings);
+      } catch (err) {
+        console.error("Error loading buyer profile/listings:", err);
         setErrorMessage("Listings could not be loaded. Please check that the latest database migration is applied.");
-      } else {
-        setListings(activeListings || []);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     loadBuyer();

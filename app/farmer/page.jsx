@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getUserProfile } from "@/lib/services/profiles";
+import { getFarmerListings, createListing } from "@/lib/services/listings";
 
 const initialListing = {
   title: "",
@@ -35,30 +37,22 @@ export default function FarmerPage() {
         return;
       }
 
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("full_name, role")
-        .eq("profile_id", userData.user.id)
-        .single();
+      try {
+        const profile = await getUserProfile(supabase, userData.user.id);
+        if (!profile || profile.role !== "farmer") {
+          router.replace(profile?.role === "buyer" ? "/buyer" : "/login");
+          return;
+        }
 
-      if (profileError || profile?.role !== "farmer") {
-        router.replace(profile?.role === "buyer" ? "/buyer" : "/login");
-        return;
-      }
-
-      setName(profile.full_name || "Farmer");
-      const { data: farmerListings, error: listingsError } = await supabase
-        .from("listings")
-        .select("id, title, category, asking_price, quantity_available, unit, quality_grade, location, description, status")
-        .eq("farmer_id", userData.user.id)
-        .order("created_at", { ascending: false });
-
-      if (listingsError) {
+        setName(profile.full_name || "Farmer");
+        const farmerListings = await getFarmerListings(supabase, userData.user.id);
+        setListings(farmerListings);
+      } catch (err) {
+        console.error("Error loading farmer profile/listings:", err);
         setErrorMessage("Your listings could not be loaded. Please check that the latest database migration is applied.");
-      } else {
-        setListings(farmerListings || []);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     loadFarmer();
@@ -74,33 +68,19 @@ export default function FarmerPage() {
     setSuccessMessage("");
     setSaving(true);
 
-    const supabase = createClient();
-    const { data: userData } = await supabase.auth.getUser();
-    const { data: listing, error } = await supabase
-      .from("listings")
-      .insert({
-        farmer_id: userData.user.id,
-        title: form.title,
-        category: form.category,
-        asking_price: Number(form.asking_price),
-        quantity_available: Number(form.quantity_available),
-        unit: form.unit,
-        quality_grade: form.quality_grade || null,
-        location: form.location,
-        description: form.description || null,
-      })
-      .select("id, title, category, asking_price, quantity_available, unit, quality_grade, location, description, status")
-      .single();
-
-    if (error) {
-      console.error("Supabase listing error:", error);
-      setErrorMessage("We could not publish this listing. Please check your details and database permissions.");
-    } else {
+    try {
+      const supabase = createClient();
+      const { data: userData } = await supabase.auth.getUser();
+      const listing = await createListing(supabase, userData.user.id, form);
       setListings((current) => [listing, ...current]);
       setForm(initialListing);
       setSuccessMessage("Your produce listing is now visible to buyers.");
+    } catch (error) {
+      console.error("Supabase listing error:", error);
+      setErrorMessage("We could not publish this listing. Please check your details and database permissions.");
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   async function handleLogout() {

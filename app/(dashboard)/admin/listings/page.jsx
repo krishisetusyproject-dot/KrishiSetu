@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
+import { getAllListingsForAdmin } from "@/lib/services/listings";
 
 export default function AdminListingsPage() {
   const [produceListings, setProduceListings] = useState([]);
@@ -11,19 +12,11 @@ export default function AdminListingsPage() {
     async function fetchProduceListings() {
       try {
         setLoading(true);
-        // Updated table target to 'produce'
-        const { data, error } = await supabase
-          .from("produce")
-          .select("*")
-          .order("created_at", { ascending: false });
-
-        if (error) {
-          console.error("Error fetching produce listings:", error.message);
-        } else {
-          setProduceListings(data || []);
-        }
+        const supabase = createClient();
+        const data = await getAllListingsForAdmin(supabase);
+        setProduceListings(data);
       } catch (err) {
-        console.error("Unexpected error:", err);
+        console.error("Unexpected error fetching produce listings:", err);
       } finally {
         setLoading(false);
       }
@@ -49,7 +42,7 @@ export default function AdminListingsPage() {
             <thead className="bg-slate-50 border-b text-slate-700 font-medium">
               <tr>
                 <th className="p-4">Crop Name</th>
-                <th className="p-4">Variety</th>
+                <th className="p-4">Category</th>
                 <th className="p-4">Quantity</th>
                 <th className="p-4">Asking Price</th>
                 <th className="p-4">Location</th>
@@ -59,9 +52,9 @@ export default function AdminListingsPage() {
             <tbody className="divide-y divide-slate-100">
               {produceListings.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50">
-                  <td className="p-4 font-semibold text-slate-800">{item.crop_name}</td>
-                  <td className="p-4">{item.crop_variety || "N/A"}</td>
-                  <td className="p-4">{item.quantity} {item.unit}</td>
+                  <td className="p-4 font-semibold text-slate-800">{item.title || item.crop_name}</td>
+                  <td className="p-4">{item.category || item.crop_variety || "N/A"}</td>
+                  <td className="p-4">{item.quantity_available ?? item.quantity} {item.unit}</td>
                   <td className="p-4 font-semibold text-emerald-700">₹{item.asking_price}/{item.unit}</td>
                   <td className="p-4">{item.location}</td>
                   <td className="p-4">

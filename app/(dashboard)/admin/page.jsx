@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
+import { getAllProfilesForAdmin } from "@/lib/services/profiles";
+import { getAllListingsForAdmin } from "@/lib/services/listings";
 import { 
   Users, 
   Store, 
@@ -29,41 +31,32 @@ export default function AdminDashboardPage() {
     async function fetchDashboardMetrics() {
       try {
         setLoading(true);
+        const supabase = createClient();
 
-        // Fetch user profiles metrics
-        const { data: profiles, error: profileErr } = await supabase
-          .from("profiles")
-          .select("role, verification_status");
+        // Fetch user profiles & listings via service layer
+        const profiles = await getAllProfilesForAdmin(supabase);
+        const listings = await getAllListingsForAdmin(supabase);
 
-        // Fetch produce metrics (Updated table name from 'listings' to 'produce')
-        const { data: listings, error: listingErr } = await supabase
-          .from("produce")
-          .select("asking_price, quantity, status");
+        setDbStatus("online");
 
-        if (profileErr || listingErr) {
-          setDbStatus("error");
-        } else {
-          setDbStatus("online");
+        const farmers = profiles?.filter((p) => p.role === "farmer").length || 0;
+        const buyers = profiles?.filter((p) => p.role === "buyer").length || 0;
+        const pending = profiles?.filter((p) => (p.verification_status || "pending") === "pending").length || 0;
+        const active = listings?.filter((l) => l.status === "active" || !l.status).length || 0;
 
-          const farmers = profiles?.filter((p) => p.role === "farmer").length || 0;
-          const buyers = profiles?.filter((p) => p.role === "buyer").length || 0;
-          const pending = profiles?.filter((p) => p.verification_status === "pending").length || 0;
-          const active = listings?.filter((l) => l.status === "active" || !l.status).length || 0;
+        // Calculate GMV (asking_price * quantity_available across active listings)
+        const gmv = listings?.reduce(
+          (sum, item) => sum + (Number(item.asking_price || 0) * Number(item.quantity_available || 0)), 
+          0
+        ) || 0;
 
-          // Calculate GMV (asking_price * quantity across active listings)
-          const gmv = listings?.reduce(
-            (sum, item) => sum + (Number(item.asking_price || 0) * Number(item.quantity || 0)), 
-            0
-          ) || 0;
-
-          setMetrics({
-            farmersCount: farmers,
-            buyersCount: buyers,
-            gmvTotal: gmv,
-            activeListings: active,
-            pendingKYC: pending,
-          });
-        }
+        setMetrics({
+          farmersCount: farmers,
+          buyersCount: buyers,
+          gmvTotal: gmv,
+          activeListings: active,
+          pendingKYC: pending,
+        });
       } catch (err) {
         console.error("Failed to load dashboard metrics:", err);
         setDbStatus("error");
