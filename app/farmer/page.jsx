@@ -39,12 +39,12 @@ export default function FarmerPage() {
 
       try {
         const profile = await getUserProfile(supabase, userData.user.id);
-        if (!profile || profile.role !== "farmer") {
+        if (!profile || (profile.role !== "farmer" && profile.role !== "admin")) {
           router.replace(profile?.role === "buyer" ? "/buyer" : "/login");
           return;
         }
 
-        setName(profile.full_name || "Farmer");
+        setName(profile.full_name || (profile.role === "admin" ? "Admin (Viewing as Farmer)" : "Farmer"));
         const farmerListings = await getFarmerListings(supabase, userData.user.id);
         setListings(farmerListings);
       } catch (err) {

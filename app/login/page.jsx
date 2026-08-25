@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getUserProfile } from "@/lib/services/profiles";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,6 +11,35 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentSession, setCurrentSession] = useState(null);
+
+  // Check if user is already logged in on mount
+  useEffect(() => {
+    async function checkExistingSession() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const profile = await getUserProfile(supabase, user.id);
+          const role = profile?.role || user.user_metadata?.role || "user";
+          setCurrentSession({
+            email: user.email,
+            role,
+            dashboardUrl: role === "admin" ? "/admin" : role === "farmer" ? "/farmer" : "/buyer",
+          });
+        }
+      } catch (err) {
+        console.error("Session check error:", err);
+      }
+    }
+    checkExistingSession();
+  }, []);
+
+  async function handleLogoutExisting() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setCurrentSession(null);
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -46,48 +76,44 @@ export default function LoginPage() {
       return;
     }
 
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("profile_id", data.user.id)
-      .single();
+    // Resolve profile via robust service layer
+    try {
+      const profile = await getUserProfile(supabase, data.user.id);
 
-    if (profileError || !profile?.role) {
-      const metadata = data.user.user_metadata || {};
-      const role = metadata.role === "buyer" ? "buyer" : "farmer";
-      const { error: createProfileError } = await supabase.from("profiles").upsert({
-        profile_id: data.user.id,
-        full_name: metadata.full_name || "KrishiSetu user",
-        email: data.user.email,
-        phone: metadata.phone || null,
-        role,
-        village: metadata.village || null,
-        city: metadata.city || null,
-        district: metadata.district || null,
-        state: metadata.state || null,
-        pincode: metadata.pincode || null,
-      });
+      if (!profile || !profile.role) {
+        const metadata = data.user.user_metadata || {};
+        const role = metadata.role === "admin" ? "admin" : metadata.role === "buyer" ? "buyer" : "farmer";
+        
+        await supabase.from("profiles").upsert({
+          id: data.user.id,
+          profile_id: data.user.id,
+          full_name: metadata.full_name || "KrishiSetu user",
+          email: data.user.email,
+          phone: metadata.phone || null,
+          role,
+          village: metadata.village || null,
+          city: metadata.city || null,
+          district: metadata.district || null,
+          state: metadata.state || null,
+          pincode: metadata.pincode || null,
+        });
 
-      if (createProfileError) {
-        console.error("Supabase profile lookup and creation error:", profileError, createProfileError);
-        setErrorMessage(`Profile setup failed: ${createProfileError.message}`);
-        setLoading(false);
+        router.replace(role === "admin" ? "/admin" : role === "farmer" ? "/farmer" : "/buyer");
         return;
       }
 
       router.replace(
-        role === "admin" ? "/admin" : role === "farmer" ? "/farmer" : "/buyer"
+        profile.role === "admin"
+          ? "/admin"
+          : profile.role === "farmer"
+          ? "/farmer"
+          : "/buyer"
       );
-      return;
+    } catch (profileErr) {
+      console.error("Profile resolution error:", profileErr);
+      const fallbackRole = data.user.user_metadata?.role || "farmer";
+      router.replace(fallbackRole === "admin" ? "/admin" : fallbackRole === "farmer" ? "/farmer" : "/buyer");
     }
-
-    router.replace(
-      profile.role === "admin"
-        ? "/admin"
-        : profile.role === "farmer"
-        ? "/farmer"
-        : "/buyer"
-    );
   }
 
   return (
@@ -96,13 +122,64 @@ export default function LoginPage() {
         <a href="/" className="text-sm font-semibold text-emerald-950">KrishiSetu</a>
         <h1 className="mt-8 text-3xl font-bold text-emerald-950">Welcome back</h1>
         <p className="mt-2 text-slate-600">Sign in to manage your KrishiSetu account.</p>
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-          <label className="block text-sm font-medium text-slate-700">Email<input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-700" /></label>
-          <label className="block text-sm font-medium text-slate-700">Password<input required type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-700" /></label>
+
+        {currentSession && (
+          <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 text-xs text-slate-700 space-y-2">
+            <p className="font-medium text-emerald-950">
+              Active Session: <strong className="capitalize">{currentSession.role}</strong> ({currentSession.email})
+            </p>
+            <div className="flex gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => router.push(currentSession.dashboardUrl)}
+                className="flex-1 rounded-lg bg-emerald-950 px-3 py-2 font-semibold text-amber-100"
+              >
+                Go to Dashboard
+              </button>
+              <button
+                type="button"
+                onClick={handleLogoutExisting}
+                className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                Switch Account
+              </button>
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+          <label className="block text-sm font-medium text-slate-700">
+            Email
+            <input
+              required
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-700"
+            />
+          </label>
+          <label className="block text-sm font-medium text-slate-700">
+            Password
+            <input
+              required
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-700"
+            />
+          </label>
           {errorMessage && <p className="text-sm text-red-700">{errorMessage}</p>}
-          <button disabled={loading} className="w-full rounded-xl bg-emerald-950 px-5 py-3.5 font-semibold text-amber-100 disabled:opacity-60">{loading ? "Signing in..." : "Sign In"}</button>
+          <button
+            disabled={loading}
+            className="w-full rounded-xl bg-emerald-950 px-5 py-3.5 font-semibold text-amber-100 disabled:opacity-60"
+          >
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
         </form>
-        <p className="mt-8 text-sm text-slate-600">New to KrishiSetu? <a href="/register" className="font-semibold text-emerald-900">Create an account</a></p>
+
+        <p className="mt-8 text-sm text-slate-600">
+          New to KrishiSetu? <a href="/register" className="font-semibold text-emerald-900">Create an account</a>
+        </p>
       </div>
     </main>
   );

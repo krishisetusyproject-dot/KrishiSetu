@@ -25,12 +25,12 @@ export default function BuyerPage() {
 
       try {
         const profile = await getUserProfile(supabase, userData.user.id);
-        if (!profile || profile.role !== "buyer") {
+        if (!profile || (profile.role !== "buyer" && profile.role !== "admin")) {
           router.replace(profile?.role === "farmer" ? "/farmer" : "/login");
           return;
         }
 
-        setName(profile.full_name || "Buyer");
+        setName(profile.full_name || (profile.role === "admin" ? "Admin (Viewing as Buyer)" : "Buyer"));
         const activeListings = await getActiveListings(supabase);
         setListings(activeListings);
       } catch (err) {
