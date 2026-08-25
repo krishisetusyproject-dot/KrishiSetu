@@ -30,8 +30,9 @@ export default function Footer() {
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-300">For Users</p>
             <ul className="mt-5 space-y-3 text-sm text-slate-400">
-              <li><a href="#farmer" className="hover:text-white">Farmers</a></li>
-              <li><a href="#buyer" className="hover:text-white">Buyers</a></li>
+              <li><a href="/farmer" className="hover:text-white">Farmers</a></li>
+              <li><a href="/buyer" className="hover:text-white">Buyers</a></li>
+              <li><a href="/admin" className="hover:text-amber-200 text-amber-100/70 font-medium">Admin Portal</a></li>
             </ul>
           </div>
         </div>

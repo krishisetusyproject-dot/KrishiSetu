@@ -125,7 +125,9 @@ export default function RegisterPage() {
         return;
       }
 
-      router.replace(selectedRole === "farmer" ? "/farmer" : "/buyer");
+      router.replace(
+        selectedRole === "admin" ? "/admin" : selectedRole === "farmer" ? "/farmer" : "/buyer"
+      );
       return;
     }
 
@@ -141,11 +143,13 @@ export default function RegisterPage() {
           <h1 className="text-3xl font-bold text-emerald-950">Join KrishiSetu</h1>
           <p className="mt-2 max-w-xl text-slate-600">Connect directly with buyers and sell your agricultural produce with greater transparency.</p>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {[{
               role: "farmer", icon: "👨‍🌾", title: "I'm a Farmer", description: "List and sell your produce directly to buyers.",
             }, {
               role: "buyer", icon: "🛒", title: "I'm a Buyer", description: "Find fresh produce directly from farmers.",
+            }, {
+              role: "admin", icon: "🛡️", title: "I'm an Admin", description: "Manage platform listings, verify users, and monitor MSP rates.",
             }].map((option) => (
               <button
                 key={option.role}
@@ -171,7 +175,7 @@ export default function RegisterPage() {
               {errorMessage && <p className="sm:col-span-2 text-sm text-red-700">{errorMessage}</p>}
               {message && <p className="sm:col-span-2 text-sm text-emerald-800">{message}</p>}
               <button disabled={loading} className="sm:col-span-2 rounded-xl bg-emerald-950 px-5 py-3.5 font-semibold text-amber-100 disabled:opacity-60">
-                {loading ? "Creating account..." : `Create ${selectedRole === "farmer" ? "Farmer" : "Buyer"} Account`}
+                {loading ? "Creating account..." : `Create ${selectedRole === "admin" ? "Admin" : selectedRole === "farmer" ? "Farmer" : "Buyer"} Account`}
               </button>
             </form>
           )}

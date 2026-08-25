@@ -75,11 +75,19 @@ export default function LoginPage() {
         return;
       }
 
-      router.replace(role === "farmer" ? "/farmer" : "/buyer");
+      router.replace(
+        role === "admin" ? "/admin" : role === "farmer" ? "/farmer" : "/buyer"
+      );
       return;
     }
 
-    router.replace(profile.role === "farmer" ? "/farmer" : "/buyer");
+    router.replace(
+      profile.role === "admin"
+        ? "/admin"
+        : profile.role === "farmer"
+        ? "/farmer"
+        : "/buyer"
+    );
   }
 
   return (

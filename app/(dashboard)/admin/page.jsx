@@ -153,7 +153,7 @@ export default function AdminDashboardPage() {
                   <p className="text-xs text-amber-700">{metrics.pendingKYC} user applications require identity verification.</p>
                 </div>
               </div>
-              <Link href="/admin/verification" className="text-xs font-bold text-amber-800 hover:underline flex items-center gap-1">
+              <Link href="/admin/users" className="text-xs font-bold text-amber-800 hover:underline flex items-center gap-1">
                 Review <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
@@ -176,7 +176,7 @@ export default function AdminDashboardPage() {
         <div className="bg-white p-6 rounded-xl border shadow-sm space-y-4">
           <h2 className="text-lg font-semibold text-slate-800">Quick Navigation</h2>
           <div className="grid grid-cols-2 gap-3">
-            <Link href="/admin/verification" className="p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border text-sm font-medium text-slate-700 flex justify-between items-center transition">
+            <Link href="/admin/users" className="p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border text-sm font-medium text-slate-700 flex justify-between items-center transition">
               Verification Queue <ArrowRight className="w-4 h-4 text-slate-400" />
             </Link>
             <Link href="/admin/listings" className="p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border text-sm font-medium text-slate-700 flex justify-between items-center transition">
