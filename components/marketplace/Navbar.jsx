@@ -90,7 +90,7 @@ export default function Navbar() {
               <ArrowRight size={16} />
             </a>
             <a
-              href="#buyer"
+              href="/register"
               className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-emerald-950"
             >
               Buy Produce

@@ -35,7 +35,7 @@ export default function Hero() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </a>
                   <a
-                    href="#farmer"
+                    href="http://localhost:3000/register"
                     className="inline-flex items-center justify-center rounded-full border border-[#1a2d24]/10 bg-white/75 px-6 py-3 text-base font-semibold text-[#1b120d] shadow-sm shadow-slate-900/5 backdrop-blur-sm transition hover:bg-white"
                   >
                     Sell Your Produce

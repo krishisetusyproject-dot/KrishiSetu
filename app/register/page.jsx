@@ -150,7 +150,13 @@ export default function RegisterPage() {
               <button
                 key={option.role}
                 type="button"
-                onClick={() => setSelectedRole(option.role)}
+                onClick={() => {
+                  if (option.role === "buyer") {
+                    router.push("/buyer/register");
+                    return;
+                  }
+                  setSelectedRole(option.role);
+                }}
                 className={`rounded-2xl border p-5 text-left ${selectedRole === option.role ? "border-emerald-800 bg-emerald-50" : "border-slate-200 hover:border-emerald-300"}`}
               >
                 <span className="text-3xl" aria-hidden="true">{option.icon}</span>
