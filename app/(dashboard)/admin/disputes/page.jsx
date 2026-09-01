@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminDisputesPage() {
   const [disputes, setDisputes] = useState([]);
@@ -23,6 +18,7 @@ export default function AdminDisputesPage() {
   useEffect(() => {
     async function fetchDisputes() {
       setLoading(true);
+      const supabase = createClient();
 
       const { data, error } = await supabase
         .from("disputes")
@@ -65,6 +61,7 @@ export default function AdminDisputesPage() {
   const handleUpdateStatus = async (newStatus) => {
     if (!selectedDispute) return;
     setUpdating(true);
+    const supabase = createClient();
 
     const updatePayload = {
       status: newStatus,

@@ -63,6 +63,7 @@ export default function FarmerDashboard() {
       }
 
       try {
+<<<<<<< HEAD
         const userProfile = await getUserProfile(supabase, userData.user.id);
         if (!userProfile || userProfile.role !== "farmer") {
           router.replace(userProfile?.role === "buyer" ? "/buyer" : "/login");
@@ -87,6 +88,17 @@ export default function FarmerDashboard() {
         setOffers(offersData);
         setOrders(ordersData);
         setSalesStats(statsData);
+=======
+        const profile = await getUserProfile(supabase, userData.user.id);
+        if (!profile || (profile.role !== "farmer" && profile.role !== "admin")) {
+          router.replace(profile?.role === "buyer" ? "/buyer" : "/login");
+          return;
+        }
+
+        setName(profile.full_name || (profile.role === "admin" ? "Admin (Viewing as Farmer)" : "Farmer"));
+        const farmerListings = await getFarmerListings(supabase, userData.user.id);
+        setListings(farmerListings);
+>>>>>>> 2f765da33599a7028e7a0c31fb78aa9e40b7020a
       } catch (err) {
         console.error("Error loading dashboard:", err);
         setErrorMessage("Failed to load dashboard. Please try refreshing.");
