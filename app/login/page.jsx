@@ -85,7 +85,6 @@ export default function LoginPage() {
         const role = metadata.role === "admin" ? "admin" : metadata.role === "buyer" ? "buyer" : "farmer";
         
         await supabase.from("profiles").upsert({
-          id: data.user.id,
           profile_id: data.user.id,
           full_name: metadata.full_name || "KrishiSetu user",
           email: data.user.email,
