@@ -33,3 +33,7 @@ old/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# database blueprint
+/supabase/migrations/
+/supabase/seed.sql
