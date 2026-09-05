@@ -10,7 +10,6 @@ KrishiSetu is a digital marketplace designed to eliminate middlemen by directly 
 Discover  ──►  Compare  ──►  Negotiate  ──►  Purchase  ──►  Pickup
 ```
 
-> 🚨 **Team Collaboration Rules:** All contributors MUST read and strictly follow the mandatory [Team Git & GitHub Rules](TEAM_RULES.md) before pulling or pushing code!
 
 ---
 
@@ -159,25 +158,6 @@ The underlying Supabase PostgreSQL database consists of 5 core relational tables
 
 
 
-## 🚨 Team Collaboration Protocol
-
-Before making any changes, all developers must review [TEAM_RULES.md](TEAM_RULES.md).
-
-```bash
-# 1. Start of work session
-git pull origin main
-
-# 2. Work & test locally
-
-# 3. Stage & commit with Conventional Commit message
-git add .
-git commit -m "feat: add crop search filter"
-
-# 4. End of work session
-git push origin main
-```
-
----
 
 ## 🎓 Academic Context
 
