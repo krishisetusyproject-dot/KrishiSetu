@@ -111,6 +111,7 @@ export default function BuyerRegisterPage() {
 
       if (data?.session && data?.user) {
         const { error: profileError } = await supabase.from("profiles").upsert({
+          id: data.user.id,
           profile_id: data.user.id,
           full_name: form.fullName.trim(),
           email: form.email.trim(),

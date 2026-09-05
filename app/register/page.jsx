@@ -106,6 +106,7 @@ export default function RegisterPage() {
 
     if (data.session && data.user) {
       const { error: profileError } = await supabase.from("profiles").upsert({
+        id: data.user.id,
         profile_id: data.user.id,
         full_name: form.fullName,
         email: form.email,
