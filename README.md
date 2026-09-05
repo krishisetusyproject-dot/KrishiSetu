@@ -119,9 +119,6 @@ KrishiSetu/
 │   ├── migrations/             # SQL Migration Files & RLS Policies
 │   │   └── 20260815_init.sql   # Tables for Profiles, Listings, Offers, Orders, Prices
 │   └── seed.sql                # APMC Mandi price benchmarks & MSP database
-├── TEAM_RULES.md               # Mandatory Git & GitHub Rules for Team
-├── KrishiSetu_Team_Git_Rules.html # HTML version of Team Rules
-├── KrishiSetu_Architecture_Plan.html # HTML Blueprint for Word/PDF Export
 ├── .env.example                # Template for environment configuration
 ├── .env.local                  # Local secrets (Supabase URL & Anon Key)
 ├── middleware.js               # Global Next.js Auth Session Refresh Middleware
