@@ -157,49 +157,7 @@ The underlying Supabase PostgreSQL database consists of 5 core relational tables
 * `orders` — Confirmed purchase transactions (`status`: `pending`, `confirmed`, `picked_up`, `completed`).
 * `market_prices` — APMC mandi reference prices and Government Minimum Support Prices (MSP).
 
----
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-* **Node.js** (v18.0.0 or higher)
-* **npm** (v9.0.0 or higher)
-* A **Supabase** project instance
-
-### Local Setup
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/RishabhDev676/krishisetu.git
-   cd krishisetu
-   ```
-
-2. **Pull latest changes:**
-   ```bash
-   git pull origin main
-   ```
-
-3. **Install dependencies:**
-   ```bash
-   cmd /c "npm install"
-   ```
-
-4. **Configure Environment Variables:**
-   Create `.env.local` by copying `.env.example`:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
-   ```
-
-5. **Run the Development Server:**
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
 
 ## 🚨 Team Collaboration Protocol
 
