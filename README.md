@@ -29,13 +29,13 @@ Small and medium-scale agricultural producers face recurring systemic challenges
 
 KrishiSetu provides an end-to-end digital procurement ecosystem featuring:
 
-* **Direct Marketplace:** Primary direct farmer-to-buyer trade ecosystem without commission agents.
+* **Direct Settlement & Negotiation:** KrishiSetu facilitates the matchmaking and price negotiation. Payments are settled directly between the farmer and consumer based on the finalized offer, ensuring zero commission.
 * **Partner Platforms Hub:** A directory linking farmers to other reliable F2C platforms for additional direct-selling opportunities.
-* **Verified Logistics Directory:** A dedicated hub linking to verified third-party freight and agri-logistics platforms (like Kisan Rath, KisanSabha) to solve transportation needs.
+* **Optional Logistics References:** A dedicated hub providing references to verified third-party freight platforms (like Kisan Rath, KisanSabha) only when transportation assistance is required.
 * **Verified Profiles:** Identity and credential verification for farmers and commercial buyers.
 * **Structured Crop Listings:** Clear specifications of quantity, quality grade, asking price, harvest dates, and pickup locations.
 * **Smart Price Benchmarking:** Instant visibility of local APMC rates alongside farmer asking prices.
-* **Flexible Purchase Options:** Support for instant purchase (**Buy Now**) and price negotiations (**Make Offer**).
+* **Flexible Purchase Options:** Support for accepting the asking price (**Buy Now**) and price negotiations (**Make Offer**).
 * **Trust & Reputation System:** Transparent ratings and reviews for Buyers and Farmers following order completion.
 
 ---
@@ -68,7 +68,7 @@ KrishiSetu provides an end-to-end digital procurement ecosystem featuring:
 * **Seller Reviews:** Submit ratings and qualitative feedback upon order completion.
 
 ### 🚚 Logistics & Partner Integrations
-* **Logistics Directory:** Access links to verified third-party agricultural freight services (e.g., Kisan Rath, TruckSuvidha).
+* **Optional Logistics References:** When required, users can access references/links to verified third-party agricultural freight services (e.g., Kisan Rath, TruckSuvidha).
 * **F2C Partner Hub:** Discover and navigate to other verified Farmer-to-Consumer retail platforms.
 
 ### 🛡️ Admin Capabilities
