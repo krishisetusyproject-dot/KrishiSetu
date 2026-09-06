@@ -4,10 +4,10 @@
 
 Connecting Farmers with Verified Buyers through Transparent Pricing and Direct Procurement.
 
-KrishiSetu is a digital marketplace designed to eliminate middlemen by directly connecting verified small and medium-scale farmers with verified business buyers (traders, retailers, kirana stores, restaurants, and wholesalers).
+KrishiSetu is a digital marketplace designed to eliminate middlemen by directly connecting verified small and medium-scale farmers with verified business buyers (traders, retailers, kirana stores, restaurants, and wholesalers). It also acts as an aggregator linking to other reliable Farmer-to-Consumer (F2C) brands, and integrates direct logistics through a rated Transporter system.
 
 ```text
-Discover  ──►  Compare  ──►  Negotiate  ──►  Purchase  ──►  Pickup
+Discover  ──►  Compare  ──►  Negotiate  ──►  Purchase  ──►  Transport  ──►  Pickup
 ```
 
 
@@ -18,10 +18,10 @@ Discover  ──►  Compare  ──►  Negotiate  ──►  Purchase  ──�
 Small and medium-scale agricultural producers face recurring systemic challenges:
 
 * **Intermediary Dependency:** Heavy reliance on local commission agents and traders leads to diminished profit margins for farmers.
+* **Logistics Fragmentation:** Buyers and farmers struggle to find reliable, transparent transportation to move purchased produce.
 * **Price Opacity:** Absence of accessible, real-time market price benchmarks (APMC/MSP) leads to exploitation.
 * **Uncertain Demand:** Farmers struggle to connect directly with bulk commercial buyers prior to harvest.
-* **Procurement Inefficiencies:** Buyers struggle to locate consistent, reliable agricultural suppliers with verified quality produce.
-* **Fragmented Comparison:** Lack of a centralized platform to evaluate produce availability, location, and pricing.
+* **Platform Fragmentation:** Farmers have limited visibility on where to sell directly to consumers across various F2C brands.
 
 ---
 
@@ -29,13 +29,14 @@ Small and medium-scale agricultural producers face recurring systemic challenges
 
 KrishiSetu provides an end-to-end digital procurement ecosystem featuring:
 
-* **Direct Marketplace:** Direct farmer-to-buyer trade without commission agents.
-* **Verified Profiles:** Identity and credential verification for both farmers and commercial buyers.
+* **Direct Marketplace:** Primary direct farmer-to-buyer trade ecosystem without commission agents.
+* **Partner Platforms Hub:** A directory linking farmers to other reliable F2C platforms for additional direct-selling opportunities.
+* **Integrated Transporters:** A dedicated role for logistics providers, allowing farmers and buyers to book rated transport directly.
+* **Verified Profiles:** Identity and credential verification for farmers, commercial buyers, and transporters.
 * **Structured Crop Listings:** Clear specifications of quantity, quality grade, asking price, harvest dates, and pickup locations.
-* **Smart Price Benchmarking:** Instant visibility of local APMC rates and Government Minimum Support Prices (MSP) alongside farmer asking prices.
+* **Smart Price Benchmarking:** Instant visibility of local APMC rates alongside farmer asking prices.
 * **Flexible Purchase Options:** Support for instant purchase (**Buy Now**) and price negotiations (**Make Offer**).
-* **Order Management & Tracking:** Clear status tracking from order confirmation through self-arranged buyer pickup.
-* **Trust & Reputation System:** Transparent user ratings and reviews following order completion.
+* **Trust & Reputation System:** Transparent ratings and reviews for Buyers, Farmers, and Transporters following order completion.
 
 ---
 
@@ -66,9 +67,16 @@ KrishiSetu provides an end-to-end digital procurement ecosystem featuring:
 * **Order Lifecycle Management:** Track confirmed orders, coordinate self-arranged transport, and confirm produce pickup.
 * **Seller Reviews:** Submit ratings and qualitative feedback upon order completion.
 
+### 🚚 Transporter Capabilities
+* **Fleet Management:** Register vehicles, capacity, and operational routes.
+* **Booking Requests:** Receive and accept logistics booking requests from buyers or farmers.
+* **Transit Tracking:** Update delivery status (Picked Up, In Transit, Delivered).
+* **Reputation System:** Build trust through on-time delivery ratings and reviews.
+
 ### 🛡️ Admin Capabilities
-* **User Verification:** Review and approve farmer and buyer registration credentials.
+* **User Verification:** Review and approve farmer, buyer, and transporter registration credentials.
 * **Content Moderation:** Monitor and approve crop listings to ensure marketplace quality standards.
+* **Partner Hub Management:** Add and verify links to trusted external F2C platforms.
 * **Market Rate Updates:** Maintain and update benchmark APMC reference rates and MSP values.
 * **Dispute & Order Oversight:** Monitor transactions and assist in dispute resolution.
 * **Marketplace Overview:** Access basic system analytics (active users, total listings, completed orders).
@@ -145,13 +153,14 @@ KrishiSetu/
 
 ## 🗄️ Supabase Database Schema
 
-The underlying Supabase PostgreSQL database consists of 5 core relational tables:
+The underlying Supabase PostgreSQL database consists of 6 core relational tables:
 
-* `profiles` — User profile information, role assignments (`farmer`, `buyer`, `admin`), and verification status (`verified`, `pending`).
+* `profiles` — User profile information, role assignments (`farmer`, `buyer`, `transporter`, `admin`), and verification status (`verified`, `pending`).
 * `listings` — Crop produce listings (crop type, quantity, asking price, APMC rate ref, harvest date, location).
 * `offers` — Price negotiations submitted by buyers (`offered_price`, `offered_quantity`, `status`).
-* `orders` — Confirmed purchase transactions (`status`: `pending`, `confirmed`, `picked_up`, `completed`).
+* `orders` — Confirmed purchase transactions (`status`: `pending`, `confirmed`, `picked_up`, `completed`). Includes optional `transporter_id` relation.
 * `market_prices` — APMC mandi reference prices and Government Minimum Support Prices (MSP).
+* `partner_platforms` — Directory listings for verified external F2C platforms.
 
 
 
