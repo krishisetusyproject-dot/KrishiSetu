@@ -1,15 +1,14 @@
 # KrishiSetu 🌾
 
-**Smart Agricultural Procurement & Marketplace Platform**
+**Smart Agricultural Procurement & Matchmaking Platform**
 
-Connecting Farmers with Verified Buyers through Transparent Pricing and Direct Procurement.
+Connecting Farmers with Verified Buyers through Transparent Price Negotiation, Direct Settlement, and Ecosystem Aggregation.
 
-KrishiSetu is a digital marketplace designed to eliminate middlemen by directly connecting verified small and medium-scale farmers with verified business buyers (traders, retailers, kirana stores, restaurants, and wholesalers). It also acts as an aggregator linking to other reliable Farmer-to-Consumer (F2C) brands, and integrates direct logistics through a rated Transporter system.
+KrishiSetu is a zero-commission digital marketplace designed to eliminate traditional middlemen. It directly connects verified small and medium-scale farmers with verified business buyers (traders, retailers, kirana stores, restaurants, and wholesalers). KrishiSetu facilitates the negotiation and matchmaking, while payments are settled directly between parties. It also serves as an agricultural hub, linking farmers to verified logistics providers and other Farmer-to-Consumer (F2C) platforms.
 
 ```text
-Discover  ──►  Compare  ──►  Negotiate  ──►  Purchase  ──►  Transport  ──►  Pickup
+Discover ──► Compare ──► Negotiate ──► Off-Platform Settlement ──► (Optional: Transport Ref) ──► Pickup
 ```
-
 
 ---
 
@@ -18,35 +17,31 @@ Discover  ──►  Compare  ──►  Negotiate  ──►  Purchase  ──�
 Small and medium-scale agricultural producers face recurring systemic challenges:
 
 * **Intermediary Dependency:** Heavy reliance on local commission agents and traders leads to diminished profit margins for farmers.
-* **Logistics Fragmentation:** Buyers and farmers struggle to find reliable, transparent transportation to move purchased produce.
-* **Price Opacity:** Absence of accessible, real-time market price benchmarks (APMC/MSP) leads to exploitation.
-* **Uncertain Demand:** Farmers struggle to connect directly with bulk commercial buyers prior to harvest.
-* **Platform Fragmentation:** Farmers have limited visibility on where to sell directly to consumers across various F2C brands.
+* **Price Opacity:** Absence of accessible, real-time market price benchmarks (APMC/MSP) leads to exploitation during negotiations.
+* **Fragmented Ecosystem:** Farmers lack a centralized hub to discover reliable buyers, third-party logistics, and alternative F2C platforms.
+* **Procurement Inefficiencies:** Buyers struggle to locate consistent, reliable agricultural suppliers with verified quality produce.
 
 ---
 
-## 💡 Solution
+## 💡 Solution & Core Philosophy
 
-KrishiSetu provides an end-to-end digital procurement ecosystem featuring:
+KrishiSetu provides an end-to-end digital matchmaking ecosystem. Our core philosophy is **facilitation without interference**—we provide the tools to negotiate and connect, but keep the transactions decentralized.
 
-* **Direct Settlement & Negotiation:** KrishiSetu facilitates the matchmaking and price negotiation. Payments are settled directly between the farmer and consumer based on the finalized offer, ensuring zero commission.
-* **Partner Platforms Hub:** A directory linking farmers to other reliable F2C platforms for additional direct-selling opportunities.
-* **Optional Logistics References:** A dedicated hub providing references to verified third-party freight platforms (like Kisan Rath, KisanSabha) only when transportation assistance is required.
-* **Verified Profiles:** Identity and credential verification for farmers and commercial buyers.
-* **Structured Crop Listings:** Clear specifications of quantity, quality grade, asking price, harvest dates, and pickup locations.
-* **Smart Price Benchmarking:** Instant visibility of local APMC rates alongside farmer asking prices.
-* **Flexible Purchase Options:** Support for accepting the asking price (**Buy Now**) and price negotiations (**Make Offer**).
-* **Trust & Reputation System:** Transparent ratings and reviews for Buyers and Farmers following order completion.
+* **Direct Negotiation & Settlement:** KrishiSetu facilitates matchmaking and price negotiation. Payments are settled directly between the farmer and buyer based on the finalized offer. We charge zero commission.
+* **Smart Price Benchmarking:** Instant visibility of local APMC rates and Government Minimum Support Prices (MSP) alongside farmer asking prices ensures fair negotiations.
+* **Flexible Offer System:** Support for accepting the asking price (**Buy Now**) or proposing custom rates and quantities (**Make Offer**).
+* **Verified Logistics References:** When transportation is required, the platform provides trusted references to verified third-party agricultural freight services (e.g., Kisan Rath, KisanSabha).
+* **Partner Platforms Hub:** A curated directory linking farmers to other reliable F2C platforms, expanding their direct-selling opportunities.
+* **Verified Profiles:** Identity and credential verification for both farmers and commercial buyers to ensure a safe trading environment.
 
 ---
 
 ## 🎯 Objectives
 
-* **Direct Trade Access:** Establish a reliable digital venue for direct farmer-to-buyer transactions.
+* **Zero-Commission Trade:** Establish a reliable digital venue for direct farmer-to-buyer negotiations without extracting margins.
 * **Enhanced Price Transparency:** Integrate official APMC market rates and MSP references to empower informed trade.
-* **Reduce Intermediaries:** Eliminate unnecessary layers in the supply chain to maximize farmer returns and reduce buyer costs.
-* **Verified Ecosystem:** Build trust using administrative verification for marketplace participants.
-* **Digital Record-Keeping:** Digitize procurement transactions, negotiations, and historical sales records.
+* **Unified Agricultural Hub:** Serve as the central starting point for farmers by aggregating buyers, logistics providers, and partner platforms.
+* **Verified Ecosystem:** Build trust using administrative verification for all marketplace participants.
 
 ---
 
@@ -56,28 +51,21 @@ KrishiSetu provides an end-to-end digital procurement ecosystem featuring:
 * **Account Management:** User registration, profile setup, and identity verification submission.
 * **Listing Creation:** Post crop listings specifying category, quantity, quality grade, asking price, location, and photos.
 * **Offer Negotiation:** Receive, review, accept, or reject custom price and quantity offers submitted by buyers.
-* **Order Tracking:** Manage order statuses from confirmation to buyer pickup.
-* **Sales Analytics & History:** View completed sales, revenue records, and buyer feedback.
+* **Direct Settlement Management:** Track accepted offers and mark them as completed once direct payment and pickup are settled.
+* **Partner Hub Access:** Discover alternative F2C platforms and on-demand logistics references.
 
 ### 🛍️ Buyer Capabilities
 * **Browse & Search:** Search agricultural listings with filters for crop type, location, quantity, price range, and seller rating.
-* **Market Price Reference:** View relevant APMC rates and Minimum Support Prices (MSP) directly on listing detail pages.
-* **Instant Procurement (Buy Now):** Place direct orders at the farmer's asking price.
-* **Negotiation (Make Offer):** Propose custom unit price and quantity offers to farmers.
-* **Order Lifecycle Management:** Track confirmed orders, coordinate self-arranged transport, and confirm produce pickup.
-* **Seller Reviews:** Submit ratings and qualitative feedback upon order completion.
-
-### 🚚 Logistics & Partner Integrations
-* **Optional Logistics References:** When required, users can access references/links to verified third-party agricultural freight services (e.g., Kisan Rath, TruckSuvidha).
-* **F2C Partner Hub:** Discover and navigate to other verified Farmer-to-Consumer retail platforms.
+* **Market Price Reference:** View relevant APMC rates and MSP directly on listing detail pages.
+* **Accept & Negotiate:** Instantly accept a farmer's asking price or propose a custom unit price and quantity.
+* **Logistics Assistance:** Access verified transporter references if assistance is needed to move purchased produce.
+* **Seller Reviews:** Submit ratings and qualitative feedback upon successful settlement and pickup.
 
 ### 🛡️ Admin Capabilities
 * **User Verification:** Review and approve farmer and buyer registration credentials.
 * **Content Moderation:** Monitor and approve crop listings to ensure marketplace quality standards.
-* **Partner Hub Management:** Add and verify links to trusted external F2C platforms and logistics providers.
+* **Ecosystem Management:** Add and update links to trusted external F2C platforms and logistics providers in the Partner Hub.
 * **Market Rate Updates:** Maintain and update benchmark APMC reference rates and MSP values.
-* **Dispute & Order Oversight:** Monitor transactions and assist in dispute resolution.
-* **Marketplace Overview:** Access basic system analytics (active users, total listings, completed orders).
 
 ---
 
@@ -90,8 +78,6 @@ KrishiSetu equips buyers and farmers with a **Smart Price Indicator** that dynam
 | 🟢 **Fair Price** | Market Aligned | Farmer asking price closely matches prevailing APMC market rates. |
 | 🟡 **Below Market** | High Value | Farmer asking price is below prevailing APMC market rates. |
 | 🔴 **Above Market** | Premium Pricing | Farmer asking price exceeds prevailing APMC market rates (often reflecting premium quality). |
-
-> ℹ️ *Note: The current MVP utilizes rule-based numerical comparisons against static/updated APMC database records.*
 
 ---
 
@@ -156,12 +142,11 @@ The underlying Supabase PostgreSQL database consists of 6 core relational tables
 * `profiles` — User profile information, role assignments (`farmer`, `buyer`, `admin`), and verification status (`verified`, `pending`).
 * `listings` — Crop produce listings (crop type, quantity, asking price, APMC rate ref, harvest date, location).
 * `offers` — Price negotiations submitted by buyers (`offered_price`, `offered_quantity`, `status`).
-* `orders` — Confirmed purchase transactions (`status`: `pending`, `confirmed`, `picked_up`, `completed`).
+* `orders` — Finalized match records awaiting direct settlement between parties.
 * `market_prices` — APMC mandi reference prices and Government Minimum Support Prices (MSP).
 * `partner_platforms` — Directory listings for verified external F2C platforms and logistics providers.
 
-
-
+---
 
 ## 🎓 Academic Context
 
