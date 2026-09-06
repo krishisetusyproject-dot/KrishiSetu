@@ -31,12 +31,12 @@ KrishiSetu provides an end-to-end digital procurement ecosystem featuring:
 
 * **Direct Marketplace:** Primary direct farmer-to-buyer trade ecosystem without commission agents.
 * **Partner Platforms Hub:** A directory linking farmers to other reliable F2C platforms for additional direct-selling opportunities.
-* **Integrated Transporters:** A dedicated role for logistics providers, allowing farmers and buyers to book rated transport directly.
-* **Verified Profiles:** Identity and credential verification for farmers, commercial buyers, and transporters.
+* **Verified Logistics Directory:** A dedicated hub linking to verified third-party freight and agri-logistics platforms (like Kisan Rath, KisanSabha) to solve transportation needs.
+* **Verified Profiles:** Identity and credential verification for farmers and commercial buyers.
 * **Structured Crop Listings:** Clear specifications of quantity, quality grade, asking price, harvest dates, and pickup locations.
 * **Smart Price Benchmarking:** Instant visibility of local APMC rates alongside farmer asking prices.
 * **Flexible Purchase Options:** Support for instant purchase (**Buy Now**) and price negotiations (**Make Offer**).
-* **Trust & Reputation System:** Transparent ratings and reviews for Buyers, Farmers, and Transporters following order completion.
+* **Trust & Reputation System:** Transparent ratings and reviews for Buyers and Farmers following order completion.
 
 ---
 
@@ -67,16 +67,14 @@ KrishiSetu provides an end-to-end digital procurement ecosystem featuring:
 * **Order Lifecycle Management:** Track confirmed orders, coordinate self-arranged transport, and confirm produce pickup.
 * **Seller Reviews:** Submit ratings and qualitative feedback upon order completion.
 
-### 🚚 Transporter Capabilities
-* **Fleet Management:** Register vehicles, capacity, and operational routes.
-* **Booking Requests:** Receive and accept logistics booking requests from buyers or farmers.
-* **Transit Tracking:** Update delivery status (Picked Up, In Transit, Delivered).
-* **Reputation System:** Build trust through on-time delivery ratings and reviews.
+### 🚚 Logistics & Partner Integrations
+* **Logistics Directory:** Access links to verified third-party agricultural freight services (e.g., Kisan Rath, TruckSuvidha).
+* **F2C Partner Hub:** Discover and navigate to other verified Farmer-to-Consumer retail platforms.
 
 ### 🛡️ Admin Capabilities
-* **User Verification:** Review and approve farmer, buyer, and transporter registration credentials.
+* **User Verification:** Review and approve farmer and buyer registration credentials.
 * **Content Moderation:** Monitor and approve crop listings to ensure marketplace quality standards.
-* **Partner Hub Management:** Add and verify links to trusted external F2C platforms.
+* **Partner Hub Management:** Add and verify links to trusted external F2C platforms and logistics providers.
 * **Market Rate Updates:** Maintain and update benchmark APMC reference rates and MSP values.
 * **Dispute & Order Oversight:** Monitor transactions and assist in dispute resolution.
 * **Marketplace Overview:** Access basic system analytics (active users, total listings, completed orders).
@@ -155,12 +153,12 @@ KrishiSetu/
 
 The underlying Supabase PostgreSQL database consists of 6 core relational tables:
 
-* `profiles` — User profile information, role assignments (`farmer`, `buyer`, `transporter`, `admin`), and verification status (`verified`, `pending`).
+* `profiles` — User profile information, role assignments (`farmer`, `buyer`, `admin`), and verification status (`verified`, `pending`).
 * `listings` — Crop produce listings (crop type, quantity, asking price, APMC rate ref, harvest date, location).
 * `offers` — Price negotiations submitted by buyers (`offered_price`, `offered_quantity`, `status`).
-* `orders` — Confirmed purchase transactions (`status`: `pending`, `confirmed`, `picked_up`, `completed`). Includes optional `transporter_id` relation.
+* `orders` — Confirmed purchase transactions (`status`: `pending`, `confirmed`, `picked_up`, `completed`).
 * `market_prices` — APMC mandi reference prices and Government Minimum Support Prices (MSP).
-* `partner_platforms` — Directory listings for verified external F2C platforms.
+* `partner_platforms` — Directory listings for verified external F2C platforms and logistics providers.
 
 
 
