@@ -150,4 +150,4 @@ The underlying Supabase PostgreSQL database consists of 6 core relational tables
 
 ## 🎓 Academic Context
 
-KrishiSetu was developed as a **BSc Computer Science Final Year Project** focusing on full-stack web architecture, relational database design, and direct digital procurement in agricultural supply chains.
+KrishiSetu was developed as an **SY BSc Computer Science Project** focusing on full-stack web architecture, relational database design, and direct digital procurement in agricultural supply chains.
