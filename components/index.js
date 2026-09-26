@@ -1,0 +1,12 @@
+export { default as Navbar } from './marketplace/Navbar';
+export { default as Hero } from './marketplace/Hero';
+export { default as TrustBar } from './marketplace/TrustBar';
+export { default as MarketPrices } from './marketplace/MarketPrices';
+export { default as MarketPriceCard } from './marketplace/MarketPriceCard';
+export { default as HowItWorks } from './marketplace/HowItWorks';
+export { default as FeaturedProduce } from './marketplace/FeaturedProduce';
+export { default as ProductCard } from './marketplace/ProductCard';
+export { default as BuyerCTA } from './marketplace/BuyerCTA';
+export { default as FarmerCTA } from './marketplace/FarmerCTA';
+export { default as WhyKrishiSetu } from './marketplace/WhyKrishiSetu';
+export { default as Footer } from './marketplace/Footer';

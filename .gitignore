@@ -1,0 +1,39 @@
+# dependencies
+/node_modules
+/.pnpm
+/.yarn
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files & credentials
+.env*.local
+.env
+back-end email.txt
+*.txt
+
+# non-code docs & PDF/Word/HTML plan exports
+*.docx
+*.pdf
+*.html
+old/
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# database blueprint
+/supabase/migrations/
+/supabase/seed.sql
