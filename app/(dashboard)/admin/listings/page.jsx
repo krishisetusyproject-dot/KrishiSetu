@@ -38,7 +38,8 @@ export default function AdminListingsPage() {
         ) : produceListings.length === 0 ? (
           <div className="p-8 text-center text-slate-400">No active produce listings found in database.</div>
         ) : (
-          <table className="w-full text-left text-sm text-slate-600">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-slate-600 min-w-[800px]">
             <thead className="bg-slate-50 border-b text-slate-700 font-medium">
               <tr>
                 <th className="p-4">Crop Name</th>
@@ -68,6 +69,7 @@ export default function AdminListingsPage() {
               ))}
             </tbody>
           </table>
+        </div>
         )}
       </div>
     </div>

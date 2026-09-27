@@ -37,30 +37,31 @@ export default function AdminLayout({ children }) {
       {/* Top Admin Header Bar */}
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-3">
-            <Link href="/admin" className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <Link href="/admin" className="flex items-center gap-2.5 shrink-0">
               <BrandLogo
-                className="h-9 w-auto"
-                nameClassName="font-bold text-emerald-950 text-lg"
+                className="h-8 sm:h-9 w-auto"
+                nameClassName="font-bold text-emerald-950 text-base sm:text-lg whitespace-nowrap"
+                wrapperClassName="inline-flex items-center gap-2 sm:gap-3 shrink-0"
               />
             </Link>
-            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 border border-emerald-200">
+            <span className="hidden sm:inline-block rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 border border-emerald-200 whitespace-nowrap">
               Admin Portal
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-emerald-900 bg-slate-100 px-3 py-1.5 rounded-lg transition"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-emerald-900 bg-slate-100 px-3 py-1.5 rounded-lg transition shrink-0 whitespace-nowrap"
             >
-              <ExternalLink className="w-3.5 h-3.5" /> View Marketplace
+              <ExternalLink className="w-3.5 h-3.5 shrink-0" /> <span className="hidden sm:inline">View Marketplace</span>
             </Link>
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg border border-rose-200 transition"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg border border-rose-200 transition shrink-0 whitespace-nowrap"
             >
-              <LogOut className="w-3.5 h-3.5" /> Logout
+              <LogOut className="w-3.5 h-3.5 shrink-0" /> <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
         </div>

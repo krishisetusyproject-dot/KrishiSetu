@@ -134,7 +134,8 @@ export default function AdminDisputesPage() {
               No disputes found matching status "{filterStatus}".
             </div>
           ) : (
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-slate-100 border-b border-slate-200 text-xs font-semibold text-slate-600 uppercase">
                   <th className="p-4">Reason & Details</th>
@@ -207,6 +208,7 @@ export default function AdminDisputesPage() {
                 })}
               </tbody>
             </table>
+          </div>
           )}
         </div>
 

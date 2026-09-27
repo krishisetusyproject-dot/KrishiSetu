@@ -104,7 +104,8 @@ export default function UserVerificationPage() {
         ) : filteredUsers.length === 0 ? (
           <div className="p-8 text-center text-slate-400">No users found in "{activeTab}" status.</div>
         ) : (
-          <table className="w-full text-left text-sm text-slate-600">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-slate-600 min-w-[800px]">
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-medium">
               <tr>
                 <th className="p-4">User Name</th>
@@ -160,7 +161,8 @@ export default function UserVerificationPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
 
