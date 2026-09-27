@@ -19,6 +19,7 @@ export default function BuyerOrderCard({
   paymentStatus = "Escrow Locked",
   onCancelOrder,
   onChat,
+  onLeaveReview,
 }) {
   const statusConfig = {
     pending: {
@@ -179,9 +180,21 @@ export default function BuyerOrderCard({
           )}
 
           {status === "completed" && (
-            <div className="inline-flex items-center gap-1.5 rounded-xl bg-purple-50 px-4 py-2 text-xs font-bold text-purple-800 border border-purple-300">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>Transaction Finalized & Receipt Issued</span>
+            <div className="flex items-center gap-2">
+              <div className="hidden md:inline-flex items-center gap-1.5 rounded-xl bg-purple-50 px-4 py-2 text-xs font-bold text-purple-800 border border-purple-300">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span>Transaction Finalized</span>
+              </div>
+              {onLeaveReview && (
+                <button
+                  type="button"
+                  onClick={() => onLeaveReview({ id, farmer, crop })}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-amber-600 transition active:scale-95"
+                >
+                  <Award className="h-3.5 w-3.5" />
+                  <span>Leave Review</span>
+                </button>
+              )}
             </div>
           )}
         </div>

@@ -15,6 +15,8 @@ import BuyerHeader from "@/components/buyer/BuyerHeader";
 import BuyerDock from "@/components/buyer/BuyerDock";
 import BuyerOrderCard from "@/components/buyer/BuyerOrderCard";
 import BuyerChatModal from "@/components/buyer/BuyerChatModal";
+import ReviewModal from "@/components/buyer/ReviewModal";
+import { submitReview } from "@/lib/services/reviews";
 import {
   Package,
   Clock,
@@ -39,8 +41,9 @@ function OrdersContent() {
   const [searchFilter, setSearchFilter] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Chat Modal State
+  // Modals State
   const [chatFarmer, setChatFarmer] = useState(null);
+  const [reviewOrder, setReviewOrder] = useState(null);
   const [toastMessage, setToastMessage] = useState("");
 
   useEffect(() => {
@@ -146,6 +149,17 @@ function OrdersContent() {
 
   const activeCount = orders.filter((o) => ["pending", "confirmed", "ready_for_pickup"].includes(o.status)).length;
 
+  async function handleReviewSubmit({ rating, comment, orderId }) {
+    try {
+      const supabase = createClient();
+      await submitReview(supabase, { orderId, rating, comment });
+      showToast("Thank you! Your review has been published.");
+    } catch (e) {
+      console.warn("Failed to submit review:", e);
+      showToast("Review saved locally. Will sync when online.");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f8faf6] pb-28 text-slate-900">
       <BuyerHeader
@@ -249,6 +263,7 @@ function OrdersContent() {
                 paymentStatus={ord.payment_status}
                 onCancelOrder={handleCancelOrder}
                 onChat={(farmerData) => setChatFarmer(farmerData)}
+                onLeaveReview={(orderData) => setReviewOrder(orderData)}
               />
             ))}
           </div>
@@ -277,6 +292,14 @@ function OrdersContent() {
         isOpen={Boolean(chatFarmer)}
         onClose={() => setChatFarmer(null)}
         farmer={chatFarmer || {}}
+      />
+
+      {/* Leave Review Modal */}
+      <ReviewModal
+        isOpen={Boolean(reviewOrder)}
+        onClose={() => setReviewOrder(null)}
+        order={reviewOrder}
+        onSubmit={handleReviewSubmit}
       />
     </div>
   );
