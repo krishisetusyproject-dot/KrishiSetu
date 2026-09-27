@@ -88,14 +88,14 @@ export default function BuyerHeader({
         </Link>
 
         {/* Center Nav Links */}
-        <nav className="hidden items-center gap-3 xl:gap-6 lg:flex">
+        <nav className="hidden items-center gap-3 xl:gap-5 xl:flex">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative text-xs sm:text-sm transition flex items-center gap-1.5 pb-1 ${
+                className={`relative text-xs sm:text-sm transition flex items-center gap-1.5 pb-1 shrink-0 ${
                   active
                     ? "font-bold text-emerald-950 border-b-2 border-emerald-950"
                     : "font-medium text-slate-600 hover:text-emerald-950"
@@ -117,25 +117,25 @@ export default function BuyerHeader({
         </nav>
 
         {/* Right Actions */}
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-3 xl:flex shrink-0">
           <Link
             href="/buyer/browse"
-            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950 px-4 py-2 text-xs sm:text-sm font-bold text-amber-100 shadow-sm shadow-emerald-950/10 hover:bg-emerald-900 active:scale-95 transition-all"
+            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950 px-4 py-2 text-xs sm:text-sm font-bold text-amber-100 shadow-sm shadow-emerald-950/10 hover:bg-emerald-900 active:scale-95 transition-all whitespace-nowrap shrink-0"
           >
-            <Search className="h-4 w-4" />
+            <Search className="h-4 w-4 shrink-0" />
             <span>Browse Produce</span>
           </Link>
 
           {/* User Profile Pill */}
           <Link
             href="/buyer/profile"
-            className={`flex items-center gap-2.5 rounded-full border bg-white px-3 py-1.5 shadow-xs hover:bg-slate-50 transition ${
+            className={`flex items-center gap-2.5 rounded-full border bg-white px-3 py-1.5 shadow-xs hover:bg-slate-50 transition shrink-0 ${
               pathname === "/buyer/profile"
                 ? "border-emerald-700 ring-2 ring-emerald-600/20"
                 : "border-slate-200"
             }`}
           >
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-950/10 text-xs font-bold text-emerald-950">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-950/10 text-xs font-bold text-emerald-950">
               {initial}
             </div>
             <span className="text-xs sm:text-sm font-semibold text-slate-800 max-w-[120px] truncate">
@@ -148,7 +148,7 @@ export default function BuyerHeader({
             onClick={handleDefaultLogout}
             title="Sign out"
             aria-label="Sign out"
-            className="rounded-full p-2 text-slate-500 hover:bg-red-50 hover:text-red-700 transition"
+            className="shrink-0 rounded-full p-2 text-slate-500 hover:bg-red-50 hover:text-red-700 transition"
           >
             <LogOut className="h-4 w-4" />
           </button>
@@ -158,7 +158,7 @@ export default function BuyerHeader({
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 lg:hidden"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 xl:hidden"
           aria-label="Toggle navigation menu"
         >
           {open ? <X size={18} /> : <Menu size={18} />}
@@ -167,7 +167,7 @@ export default function BuyerHeader({
 
       {/* Mobile Drawer */}
       {open && (
-        <div className="lg:hidden border-t border-slate-200/80 bg-slate-50/95 px-4 pb-5 shadow-lg">
+        <div className="xl:hidden border-t border-slate-200/80 bg-slate-50/95 px-4 pb-5 shadow-lg">
           <div className="space-y-1.5 pt-4">
             {navItems.map((item) => {
               const active = isActive(item.href);

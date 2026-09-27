@@ -56,17 +56,17 @@ export default function FarmerHeader({
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-slate-50/95 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
         {/* Brand */}
-        <Link href="/farmer" className="flex items-center gap-3 group">
+        <Link href="/farmer" className="flex items-center gap-3 group shrink-0">
           <BrandLogo
             className="h-11 w-auto transition-transform group-hover:scale-[1.02]"
-            nameClassName="text-lg font-extrabold text-emerald-950"
+            nameClassName="text-lg font-extrabold text-emerald-950 whitespace-nowrap"
             subtitle="Farmer Portal"
-            subtitleClassName="text-[11px] font-medium text-slate-500"
+            subtitleClassName="text-[11px] font-medium text-slate-500 whitespace-nowrap"
           />
         </Link>
 
         {/* Center Nav Links */}
-        <nav className="hidden items-center gap-6 xl:gap-8 lg:flex">
+        <nav className="hidden items-center gap-3 xl:gap-6 xl:flex">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
@@ -91,7 +91,7 @@ export default function FarmerHeader({
         </nav>
 
         {/* Right Actions */}
-        <div className="hidden items-center gap-3.5 lg:flex">
+        <div className="hidden items-center gap-3.5 xl:flex">
           <button
             onClick={handleSellClick}
             className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950 px-4 py-2 text-xs sm:text-sm font-bold text-amber-100 shadow-sm shadow-emerald-950/10 hover:bg-emerald-900 active:scale-95 transition-all"
@@ -132,7 +132,7 @@ export default function FarmerHeader({
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 lg:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 xl:hidden"
           aria-label="Toggle navigation menu"
         >
           {open ? <X size={18} /> : <Menu size={18} />}
@@ -141,7 +141,7 @@ export default function FarmerHeader({
 
       {/* Mobile Drawer */}
       {open && (
-        <div className="lg:hidden border-t border-slate-200/80 bg-slate-50/95 px-4 pb-5 shadow-lg">
+        <div className="xl:hidden border-t border-slate-200/80 bg-slate-50/95 px-4 pb-5 shadow-lg">
           <div className="space-y-1.5 pt-4">
             {navItems.map((item) => {
               const active = isActive(item.href);
