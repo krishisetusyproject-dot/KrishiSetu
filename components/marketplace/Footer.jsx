@@ -1,10 +1,15 @@
+import BrandLogo from "@/components/BrandLogo";
+
 export default function Footer() {
   return (
     <footer className="bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="text-xl font-semibold text-amber-200">KrishiSetu</p>
+            <BrandLogo
+              className="h-12 w-auto rounded bg-white px-2 py-1"
+              nameClassName="text-lg font-semibold text-amber-200"
+            />
             <p className="mt-4 max-w-xs text-sm leading-6 text-slate-300">
               Connecting farms to markets with trust, transparency, and direct farmer–buyer connections.
             </p>

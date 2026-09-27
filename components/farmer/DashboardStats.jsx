@@ -1,70 +1,90 @@
-import { Leaf, AlertCircle, TrendingUp } from "lucide-react";
+"use client";
+
+import Link from "next/link";
+import { Package, ShoppingBag, Truck, ShieldCheck, ArrowRight } from "lucide-react";
 
 export default function DashboardStats({
   activeProduce = 0,
   pendingOffers = 0,
   activeOrders = 0,
-  totalSales = 0,
+  verificationStatus = "Verified",
   loading = false,
 }) {
   const stats = [
     {
-      icon: Leaf,
-      label: "Active Produce",
+      label: "Active Produce Listings",
       value: activeProduce,
-      subtext: "Currently listed",
-      color: "emerald",
+      subtext: "Live on open buyer marketplace",
+      icon: Package,
+      href: "/farmer/produce",
+      actionText: "Manage Produce",
     },
     {
-      icon: AlertCircle,
-      label: "Pending Offers",
+      label: "Pending Buyer Offers",
       value: pendingOffers,
-      subtext: "Offers awaiting response",
-      color: "orange",
+      subtext: "Awaiting your price response",
+      icon: ShoppingBag,
+      href: "/farmer/offers",
+      actionText: "Review Offers",
     },
     {
-      icon: TrendingUp,
-      label: "Active Orders",
+      label: "Confirmed Orders",
       value: activeOrders,
-      subtext: "Orders in progress",
-      color: "blue",
+      subtext: "Ready for buyer pickup",
+      icon: Truck,
+      href: "/farmer/orders",
+      actionText: "Track Pickups",
     },
     {
-      icon: TrendingUp,
-      label: "Total Sales",
-      value: `₹${totalSales.toLocaleString()}`,
-      subtext: "Completed sales",
-      color: "green",
+      label: "Account Status",
+      value: verificationStatus,
+      subtext: "Direct escrow settlement ready",
+      icon: ShieldCheck,
+      href: "/farmer/profile",
+      actionText: "View Profile",
     },
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat, idx) => {
-        const Icon = stat.icon;
-        const colorClasses = {
-          emerald: "bg-emerald-50 text-emerald-600",
-          orange: "bg-orange-50 text-orange-600",
-          blue: "bg-blue-50 text-blue-600",
-          green: "bg-green-50 text-green-600",
-        };
-
+        const IconComponent = stat.icon;
         return (
           <div
             key={idx}
-            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
+            className="flex flex-col justify-between rounded-[1.75rem] border border-slate-200/80 bg-white p-6 shadow-sm shadow-slate-900/5 transition hover:border-emerald-950/20"
           >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">{stat.label}</p>
-                <p className="mt-2 text-3xl font-bold text-slate-900">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-950/10 text-emerald-950">
+                  <IconComponent className="h-5 w-5" />
+                </div>
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-950/70">
+                  Metric
+                </span>
+              </div>
+
+              <div className="mt-4">
+                <p className="text-3xl font-bold tracking-tight text-slate-950">
                   {loading ? "..." : stat.value}
                 </p>
-                <p className="mt-1 text-xs text-slate-500">{stat.subtext}</p>
+                <h3 className="mt-1 text-sm font-semibold text-emerald-950">
+                  {stat.label}
+                </h3>
+                <p className="mt-1 text-xs text-slate-500">
+                  {stat.subtext}
+                </p>
               </div>
-              <div className={`rounded-lg p-3 ${colorClasses[stat.color]}`}>
-                <Icon className="h-6 w-6" />
-              </div>
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-slate-100">
+              <Link
+                href={stat.href}
+                className="group inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-950 hover:underline"
+              >
+                <span>{stat.actionText}</span>
+                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition" />
+              </Link>
             </div>
           </div>
         );
