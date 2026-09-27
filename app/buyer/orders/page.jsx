@@ -14,8 +14,9 @@ import {
 import BuyerHeader from "@/components/buyer/BuyerHeader";
 import BuyerDock from "@/components/buyer/BuyerDock";
 import BuyerOrderCard from "@/components/buyer/BuyerOrderCard";
-import BuyerChatModal from "@/components/buyer/BuyerChatModal";
-import ReviewModal from "@/components/buyer/ReviewModal";
+import dynamic from "next/dynamic";
+const BuyerChatModal = dynamic(() => import("@/components/buyer/BuyerChatModal"), { ssr: false });
+const ReviewModal = dynamic(() => import("@/components/buyer/ReviewModal"), { ssr: false });
 import { submitReview } from "@/lib/services/reviews";
 import {
   Package,

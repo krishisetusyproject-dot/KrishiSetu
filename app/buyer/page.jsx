@@ -18,8 +18,9 @@ import BuyerHeader from "@/components/buyer/BuyerHeader";
 import BuyerDock from "@/components/buyer/BuyerDock";
 import BuyerStats from "@/components/buyer/BuyerStats";
 import BuyerProduceCard from "@/components/buyer/BuyerProduceCard";
-import BuyerOrderModal from "@/components/buyer/BuyerOrderModal";
-import BuyerChatModal from "@/components/buyer/BuyerChatModal";
+import dynamic from "next/dynamic";
+const BuyerOrderModal = dynamic(() => import("@/components/buyer/BuyerOrderModal"), { ssr: false });
+const BuyerChatModal = dynamic(() => import("@/components/buyer/BuyerChatModal"), { ssr: false });
 import {
   Search,
   ArrowRight,

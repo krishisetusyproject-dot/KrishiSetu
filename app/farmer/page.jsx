@@ -21,7 +21,8 @@ import WelcomeHeader from "@/components/farmer/WelcomeHeader";
 import DashboardStats from "@/components/farmer/DashboardStats";
 import ProduceCard from "@/components/farmer/ProduceCard";
 import OrderCard from "@/components/farmer/OrderCard";
-import SellProduceModal from "@/components/farmer/SellProduceModal";
+import dynamic from "next/dynamic";
+const SellProduceModal = dynamic(() => import("@/components/farmer/SellProduceModal"), { ssr: false });
 import {
   ArrowRight,
   TrendingUp,

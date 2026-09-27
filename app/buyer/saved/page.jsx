@@ -1,25 +1,52 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { DEFAULT_BUYER_PRODUCE, DEFAULT_BUYER_PROFILE } from "@/lib/services/buyer-defaults";
 
 import BuyerHeader from "@/components/buyer/BuyerHeader";
 import BuyerDock from "@/components/buyer/BuyerDock";
 import BuyerProduceCard from "@/components/buyer/BuyerProduceCard";
-import BuyerOrderModal from "@/components/buyer/BuyerOrderModal";
-import BuyerChatModal from "@/components/buyer/BuyerChatModal";
-import {
-  Heart,
-  User,
-  ShieldCheck,
-  MapPin,
-  Trash2,
-  ArrowRight,
-  MessageSquare,
-  Sparkles,
-  Package,
-} from "lucide-react";
+import { Heart, User, ShieldCheck, MapPin, ArrowRight, MessageSquare, Sparkles, Package } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const BuyerOrderModal = dynamic(() => import("@/components/buyer/BuyerOrderModal"), { ssr: false });
+const BuyerChatModal = dynamic(() => import("@/components/buyer/BuyerChatModal"), { ssr: false });
+
+const SAVED_FARMERS_DATA = [
+  {
+    id: "farmer-ramesh-patil",
+    name: "Ramesh Patil",
+    location: "Dindori, Nashik",
+    crops: "Hybrid Red Tomatoes, Green Capsicum",
+    rating: 4.9,
+    dealsCompleted: 38,
+    verified: true,
+    phone: "+91 98220 12345",
+  },
+  {
+    id: "farmer-kailas-shinde",
+    name: "Kailas Shinde",
+    location: "Lasalgaon, Nashik",
+    crops: "Nashik Red Onions (Garwa), Garlic",
+    rating: 4.8,
+    dealsCompleted: 64,
+    verified: true,
+    phone: "+91 98224 88712",
+  },
+  {
+    id: "farmer-eknath-jagtap",
+    name: "Eknath Jagtap",
+    location: "Niphad, Nashik",
+    crops: "Sharbati Golden Wheat, Soyabean",
+    rating: 5.0,
+    dealsCompleted: 42,
+    verified: true,
+    phone: "+91 98225 33190",
+  },
+];
+
+const EMPTY_FARMER = {};
 
 export default function BuyerWishlistPage() {
   const [profile, setProfile] = useState(DEFAULT_BUYER_PROFILE);
@@ -29,39 +56,6 @@ export default function BuyerWishlistPage() {
   const [chatFarmer, setChatFarmer] = useState(null);
   const [toastMessage, setToastMessage] = useState("");
 
-  const savedFarmers = [
-    {
-      id: "farmer-ramesh-patil",
-      name: "Ramesh Patil",
-      location: "Dindori, Nashik",
-      crops: "Hybrid Red Tomatoes, Green Capsicum",
-      rating: 4.9,
-      dealsCompleted: 38,
-      verified: true,
-      phone: "+91 98220 12345",
-    },
-    {
-      id: "farmer-kailas-shinde",
-      name: "Kailas Shinde",
-      location: "Lasalgaon, Nashik",
-      crops: "Nashik Red Onions (Garwa), Garlic",
-      rating: 4.8,
-      dealsCompleted: 64,
-      verified: true,
-      phone: "+91 98224 88712",
-    },
-    {
-      id: "farmer-eknath-jagtap",
-      name: "Eknath Jagtap",
-      location: "Niphad, Nashik",
-      crops: "Sharbati Golden Wheat, Soyabean",
-      rating: 5.0,
-      dealsCompleted: 42,
-      verified: true,
-      phone: "+91 98225 33190",
-    },
-  ];
-
   useEffect(() => {
     try {
       const stored = localStorage.getItem("krishi_buyer_saved");
@@ -69,28 +63,30 @@ export default function BuyerWishlistPage() {
     } catch {}
   }, []);
 
-  function showToast(msg) {
+  const showToast = useCallback((msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(""), 4000);
-  }
+  }, []);
 
-  function handleRemoveProduce(id) {
-    const updated = savedProduceIds.filter((pId) => pId !== id);
-    setSavedProduceIds(updated);
-    try {
-      localStorage.setItem("krishi_buyer_saved", JSON.stringify(updated));
-    } catch {}
+  const handleRemoveProduce = useCallback((id) => {
+    setSavedProduceIds((prev) => {
+      const updated = prev.filter((pId) => pId !== id);
+      try {
+        localStorage.setItem("krishi_buyer_saved", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
     showToast("Removed from Wishlist");
-  }
+  }, [showToast]);
 
-  function handleOrderPlaced(order) {
+  const handleOrderPlaced = useCallback((order) => {
     try {
       const existing = JSON.parse(localStorage.getItem("krishi_buyer_orders") || "[]");
       const updated = [order, ...existing];
       localStorage.setItem("krishi_buyer_orders", JSON.stringify(updated));
     } catch {}
     showToast(`Order #${order.id} sent to farmer successfully!`);
-  }
+  }, [showToast]);
 
   // Saved produce objects
   const savedProduceItems = useMemo(() => {
@@ -149,7 +145,7 @@ export default function BuyerWishlistPage() {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Saved Farmers ({savedFarmers.length})
+              Saved Farmers ({SAVED_FARMERS_DATA.length})
             </button>
           </div>
         </div>
@@ -192,7 +188,7 @@ export default function BuyerWishlistPage() {
         {/* Saved Farmers View */}
         {activeSubTab === "farmers" && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {savedFarmers.map((farmer) => (
+            {SAVED_FARMERS_DATA.map((farmer) => (
               <div
                 key={farmer.id}
                 className="flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-6 shadow-xs hover:shadow-md transition"
