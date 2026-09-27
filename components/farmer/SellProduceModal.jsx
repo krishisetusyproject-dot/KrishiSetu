@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { X, Sparkles, Upload, Check } from "lucide-react";
+import { X, Sparkles, Upload, Check, ImageIcon } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 const PRESET_CROPS = [
   {
@@ -63,6 +64,7 @@ export default function SellProduceModal({
     imageUrl: "",
   });
 
+  const [imageFile, setImageFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -87,6 +89,19 @@ export default function SellProduceModal({
       quality_grade: preset.grade,
       imageUrl: preset.image,
     }));
+    setImageFile(null); // Clear custom upload if preset is chosen
+  }
+
+  function handleImageChange(e) {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image size must be less than 5MB");
+        return;
+      }
+      setImageFile(file);
+      setError("");
+    }
   }
 
   async function handleSubmit(e) {
@@ -100,11 +115,31 @@ export default function SellProduceModal({
 
     setSaving(true);
     try {
-      await onSubmit(form);
+      let finalForm = { ...form };
+
+      if (imageFile) {
+        const supabase = createClient();
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('produce-images')
+          .upload(fileName, imageFile, { upsert: false });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('produce-images')
+          .getPublicUrl(fileName);
+
+        finalForm.imageUrl = publicUrl;
+      }
+
+      await onSubmit(finalForm);
       onClose();
     } catch (err) {
       console.error(err);
-      setError("Failed to publish produce. Please check your connection.");
+      setError("Failed to publish produce. If image failed, check bucket permissions.");
     } finally {
       setSaving(false);
     }
@@ -329,6 +364,46 @@ export default function SellProduceModal({
               <Sparkles className="h-4 w-4 text-amber-600" />
               <span>Certified / Naturally Grown Organic Produce (Attracts premium buyers)</span>
             </label>
+          </div>
+
+          {/* Image Upload */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              Actual Produce Photo (Optional, max 5MB)
+            </label>
+            <div className="flex items-center gap-4">
+              <label className="flex-1 flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-200 rounded-xl hover:bg-slate-50 hover:border-emerald-500 transition cursor-pointer">
+                <ImageIcon className="h-6 w-6 text-slate-400 mb-2" />
+                <span className="text-xs font-medium text-slate-600">
+                  {imageFile ? imageFile.name : "Click to upload image"}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+              {(imageFile || form.imageUrl) && (
+                <div className="h-20 w-20 rounded-xl border border-slate-200 overflow-hidden shrink-0 relative bg-slate-100">
+                  <img
+                    src={imageFile ? URL.createObjectURL(imageFile) : form.imageUrl}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageFile(null);
+                      setForm(p => ({ ...p, imageUrl: "" }));
+                    }}
+                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-red-500 transition"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Description */}
