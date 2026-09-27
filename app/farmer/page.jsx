@@ -404,6 +404,7 @@ export default function FarmerDashboard() {
                 status={item.status}
                 description={item.description}
                 imageUrl={item.imageUrl}
+                marketReference={`₹${Math.max(10, (item.asking_price || 25) - 2)}–${(item.asking_price || 25) + 3} / ${item.unit || "kg"}`}
                 onToggleStatus={(id, newStatus) => {
                   setListings((prev) =>
                     prev.map((l) => (l.id === id ? { ...l, status: newStatus } : l))

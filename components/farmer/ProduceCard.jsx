@@ -27,6 +27,26 @@ function resolveImage(title, imageUrl) {
   return DEFAULT_IMAGE;
 }
 
+function getSmartPriceIndicator(listedPrice, marketRefString) {
+  if (!marketRefString || !listedPrice) return null;
+  const numbers = marketRefString.match(/\d+/g);
+  if (!numbers || numbers.length === 0) return null;
+  
+  let marketAvg = numbers.length >= 2 
+    ? (parseInt(numbers[0]) + parseInt(numbers[1])) / 2 
+    : parseInt(numbers[0]);
+  
+  const diffPercent = ((listedPrice - marketAvg) / marketAvg) * 100;
+  
+  if (diffPercent < -5) {
+    return { label: "Below Market", color: "bg-amber-400/90 text-amber-950", icon: "🟡" };
+  } else if (diffPercent > 5) {
+    return { label: "Above Market", color: "bg-rose-600/90 text-white", icon: "🔴" };
+  } else {
+    return { label: "Fair Price", color: "bg-emerald-600/90 text-white", icon: "🟢" };
+  }
+}
+
 // memo prevents unnecessary re-renders when parent state changes (e.g. toast messages)
 const ProduceCard = memo(function ProduceCard({
   id,
@@ -40,11 +60,13 @@ const ProduceCard = memo(function ProduceCard({
   location,
   status = "active",
   imageUrl,
+  marketReference,
   onToggleStatus,
   onDelete,
 }) {
   const isPaused = status === "paused";
   const resolvedImage = resolveImage(title, imageUrl);
+  const priceIndicator = getSmartPriceIndicator(askingPrice, marketReference);
 
   return (
     <article className="overflow-hidden rounded-[2rem] border border-slate-200/90 bg-white shadow-sm shadow-slate-900/5 transition hover:shadow-md">
@@ -56,7 +78,7 @@ const ProduceCard = memo(function ProduceCard({
           className="object-cover transition duration-500 hover:scale-105"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
           <span
             className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] ${
               isPaused
@@ -66,6 +88,15 @@ const ProduceCard = memo(function ProduceCard({
           >
             {isPaused ? "Paused" : "Active"}
           </span>
+          {priceIndicator && (
+            <span
+              className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wide backdrop-blur-sm shadow-sm ${priceIndicator.color}`}
+              title="Smart Price Indicator (compared to APMC Reference)"
+            >
+              <span className="text-[10px]">{priceIndicator.icon}</span>
+              {priceIndicator.label}
+            </span>
+          )}
         </div>
       </div>
 

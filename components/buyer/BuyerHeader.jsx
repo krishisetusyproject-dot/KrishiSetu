@@ -48,6 +48,7 @@ export default function BuyerHeader({
       badgeColor: "bg-rose-500",
     },
     { label: "Market Prices", href: "/buyer/market-prices", icon: TrendingUp },
+    { label: "Logistics Hub", href: "/buyer/logistics", icon: Package },
     {
       label: "Notifications",
       href: "/buyer/notifications",

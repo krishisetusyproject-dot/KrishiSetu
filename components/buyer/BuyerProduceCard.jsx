@@ -36,6 +36,26 @@ function resolveImage(title, imageUrl) {
   return DEFAULT_IMAGE;
 }
 
+function getSmartPriceIndicator(listedPrice, marketRefString) {
+  if (!marketRefString || !listedPrice) return null;
+  const numbers = marketRefString.match(/\d+/g);
+  if (!numbers || numbers.length === 0) return null;
+  
+  let marketAvg = numbers.length >= 2 
+    ? (parseInt(numbers[0]) + parseInt(numbers[1])) / 2 
+    : parseInt(numbers[0]);
+  
+  const diffPercent = ((listedPrice - marketAvg) / marketAvg) * 100;
+  
+  if (diffPercent < -5) {
+    return { label: "Below Market", color: "bg-amber-400/90 text-amber-950", icon: "🟡" };
+  } else if (diffPercent > 5) {
+    return { label: "Above Market", color: "bg-rose-600/90 text-white", icon: "🔴" };
+  } else {
+    return { label: "Fair Price", color: "bg-emerald-600/90 text-white", icon: "🟢" };
+  }
+}
+
 // memo: prevents re-renders when parent list state (savedIds, toast) changes
 const BuyerProduceCard = memo(function BuyerProduceCard({
   id,
@@ -59,6 +79,7 @@ const BuyerProduceCard = memo(function BuyerProduceCard({
   onChat,
 }) {
   const resolvedImage = resolveImage(title, imageUrl);
+  const priceIndicator = getSmartPriceIndicator(listedPrice, marketReference);
 
   return (
     <article className="group flex flex-col justify-between overflow-hidden rounded-[2rem] border border-slate-200/90 bg-white shadow-xs hover:shadow-md transition-all duration-300">
@@ -74,6 +95,15 @@ const BuyerProduceCard = memo(function BuyerProduceCard({
 
         {/* Top Badges */}
         <div className="absolute top-3.5 left-3.5 flex flex-wrap gap-1.5">
+          {priceIndicator && (
+            <span
+              className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wide backdrop-blur-sm shadow-sm ${priceIndicator.color}`}
+              title="Smart Price Indicator (compared to APMC Reference)"
+            >
+              <span className="text-[10px]">{priceIndicator.icon}</span>
+              {priceIndicator.label}
+            </span>
+          )}
           <span className="rounded-full bg-emerald-950/80 backdrop-blur-sm px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-100">
             {qualityGrade || "Grade A"}
           </span>

@@ -24,6 +24,7 @@ export default function FarmerHeader({
     { label: "Buyer Offers", href: "/farmer/offers", badge: notificationCount },
     { label: "Orders & Pickup", href: "/farmer/orders" },
     { label: "Live Mandi Rates", href: "/farmer/market-prices" },
+    { label: "Logistics Hub", href: "/farmer/logistics" },
   ];
 
   function isActive(href) {

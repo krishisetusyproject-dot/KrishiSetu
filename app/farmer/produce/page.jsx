@@ -299,6 +299,7 @@ function ProduceInventoryContent() {
                   status={item.status}
                   description={item.description}
                   imageUrl={item.imageUrl}
+                  marketReference={`₹${Math.max(10, (item.asking_price || 25) - 2)}–${(item.asking_price || 25) + 3} / ${item.unit || "kg"}`}
                   onToggleStatus={handleToggleStatus}
                   onDelete={handleDelete}
                 />
