@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import BrandLogo from "@/components/BrandLogo";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProfile } from "@/lib/services/profiles";
 
@@ -118,7 +119,9 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f8faf5] px-4 py-10 text-slate-900">
       <div className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
-        <a href="/" className="text-sm font-semibold text-emerald-950">KrishiSetu</a>
+        <a href="/" aria-label="KrishiSetu home" className="inline-flex">
+          <BrandLogo className="h-10 w-auto" nameClassName="text-lg font-semibold text-emerald-950" />
+        </a>
         <h1 className="mt-8 text-3xl font-bold text-emerald-950">Welcome back</h1>
         <p className="mt-2 text-slate-600">Sign in to manage your KrishiSetu account.</p>
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import BrandLogo from "@/components/BrandLogo";
 import { createClient } from "@/lib/supabase/client";
 import { 
   LayoutDashboard, 
@@ -38,10 +39,10 @@ export default function AdminLayout({ children }) {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
             <Link href="/admin" className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-950 text-sm font-bold text-amber-100">
-                K
-              </span>
-              <span className="font-bold text-emerald-950 text-lg">KrishiSetu</span>
+              <BrandLogo
+                className="h-9 w-auto"
+                nameClassName="font-bold text-emerald-950 text-lg"
+              />
             </Link>
             <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 border border-emerald-200">
               Admin Portal

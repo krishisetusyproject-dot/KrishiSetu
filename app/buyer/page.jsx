@@ -2,187 +2,459 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProfile } from "@/lib/services/profiles";
 import { getActiveListings } from "@/lib/services/listings";
-import { createOffer } from "@/lib/services/offers";
+import { getBuyerOrders, createBuyerOrder, cancelBuyerOrder } from "@/lib/services/orders";
+import {
+  DEFAULT_BUYER_PROFILE,
+  DEFAULT_BUYER_PRODUCE,
+  DEFAULT_BUYER_ORDERS,
+  DEFAULT_MARKET_PRICES,
+} from "@/lib/services/buyer-defaults";
 
-export default function BuyerPage() {
+import BuyerHeader from "@/components/buyer/BuyerHeader";
+import BuyerDock from "@/components/buyer/BuyerDock";
+import BuyerStats from "@/components/buyer/BuyerStats";
+import BuyerProduceCard from "@/components/buyer/BuyerProduceCard";
+import BuyerOrderModal from "@/components/buyer/BuyerOrderModal";
+import BuyerChatModal from "@/components/buyer/BuyerChatModal";
+import {
+  Search,
+  ArrowRight,
+  TrendingUp,
+  Sparkles,
+  ShieldCheck,
+  CheckCircle2,
+  Clock,
+  Layers,
+  MapPin,
+  Package,
+} from "lucide-react";
+
+export default function BuyerDashboardPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [name, setName] = useState("Buyer");
-  const [userId, setUserId] = useState(null);
-  const [listings, setListings] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  
-  // Offer Modal State
-  const [selectedListing, setSelectedListing] = useState(null);
-  const [offerForm, setOfferForm] = useState({ price: "", quantity: "", notes: "" });
-  const [submitting, setSubmitting] = useState(false);
 
+  // Core Data State
+  const [profile, setProfile] = useState(DEFAULT_BUYER_PROFILE);
+  const [produceList, setProduceList] = useState(DEFAULT_BUYER_PRODUCE);
+  const [orders, setOrders] = useState(DEFAULT_BUYER_ORDERS);
+  const [savedProduceIds, setSavedProduceIds] = useState(["b-prod-101", "b-prod-103"]);
+  const [loading, setLoading] = useState(true);
+
+  // Search & Filter State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCropFilter, setSelectedCropFilter] = useState("All");
+
+  // Modals
+  const [orderModalListing, setOrderModalListing] = useState(null);
+  const [chatModalFarmer, setChatModalFarmer] = useState(null);
+  const [toastMessage, setToastMessage] = useState("");
+
+  // Load live data from Supabase with safe fallback
   useEffect(() => {
-    async function loadBuyer() {
+    async function loadData() {
+      // Load saved wishlist from localStorage
+      try {
+        const storedWishlist = localStorage.getItem("krishi_buyer_saved");
+        if (storedWishlist) setSavedProduceIds(JSON.parse(storedWishlist));
+
+        const storedOrders = localStorage.getItem("krishi_buyer_orders");
+        if (storedOrders) setOrders(JSON.parse(storedOrders));
+      } catch (e) {
+        console.warn("Storage read error:", e);
+      }
+
       const supabase = createClient();
       const { data: userData } = await supabase.auth.getUser();
 
-      if (!userData.user) {
-        router.replace("/login");
+      if (!userData?.user) {
+        setLoading(false);
         return;
       }
 
-      setUserId(userData.user.id);
-
       try {
-        const profile = await getUserProfile(supabase, userData.user.id);
-        if (!profile || (profile.role !== "buyer" && profile.role !== "admin")) {
-          router.replace(profile?.role === "farmer" ? "/farmer" : "/login");
-          return;
+        const userProfile = await getUserProfile(supabase, userData.user.id);
+        if (userProfile) {
+          setProfile({
+            ...DEFAULT_BUYER_PROFILE,
+            ...userProfile,
+          });
         }
 
-        setName(profile.full_name || (profile.role === "admin" ? "Admin (Viewing as Buyer)" : "Buyer"));
-        const activeListings = await getActiveListings(supabase);
-        setListings(activeListings);
+        const [dbListings, dbOrders] = await Promise.all([
+          getActiveListings(supabase).catch(() => []),
+          getBuyerOrders(supabase, userData.user.id).catch(() => []),
+        ]);
+
+        if (dbListings && dbListings.length > 0) {
+          const mapped = dbListings.map((l) => ({
+            id: l.id,
+            title: l.title,
+            category: l.category || "Vegetables",
+            variety: l.variety || "Commercial Hybrid",
+            listedPrice: l.asking_price || 25,
+            unit: l.unit || "kg",
+            quantityAvailable: l.quantity_available || 500,
+            marketReference: `₹${Math.max(10, (l.asking_price || 25) - 2)}–${(l.asking_price || 25) + 3} / ${l.unit || "kg"}`,
+            farmerName: l.profiles?.full_name || "Verified Farmer",
+            farmerVerified: true,
+            location: l.location || "Nashik, Maharashtra",
+            qualityGrade: l.quality_grade || "Grade A",
+            harvestDate: "Immediate",
+            organic: Boolean(l.organic),
+            imageUrl: l.image_url || null,
+          }));
+          setProduceList(mapped);
+        }
+
+        if (dbOrders && dbOrders.length > 0) {
+          setOrders((prev) => {
+            const merged = [...dbOrders, ...prev.filter((p) => !dbOrders.some((d) => d.id === p.id))];
+            return merged;
+          });
+        }
       } catch (err) {
-        console.error("Error loading buyer profile/listings:", err);
-        setErrorMessage("Listings could not be loaded. Please check that the latest database migration is applied.");
+        console.warn("Could not load database records:", err);
       } finally {
         setLoading(false);
       }
     }
 
-    loadBuyer();
+    loadData();
   }, [router]);
 
-  async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.replace("/");
+  function showToast(msg) {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(""), 4500);
   }
 
-  function openOfferModal(listing) {
-    setSelectedListing(listing);
-    setOfferForm({ price: listing.asking_price, quantity: listing.quantity_available, notes: "" });
+  // Toggle Save Produce to Wishlist
+  function handleToggleSave(id) {
+    setSavedProduceIds((prev) => {
+      let updated;
+      if (prev.includes(id)) {
+        updated = prev.filter((pId) => pId !== id);
+        showToast("Removed produce from your wishlist.");
+      } else {
+        updated = [...prev, id];
+        showToast("Saved produce to your wishlist!");
+      }
+      try {
+        localStorage.setItem("krishi_buyer_saved", JSON.stringify(updated));
+      } catch (e) {
+        console.warn(e);
+      }
+      return updated;
+    });
   }
 
-  async function submitOffer(e) {
-    e.preventDefault();
-    setErrorMessage("");
-    setSubmitting(true);
-    
+  // Submit Offer / Order
+  async function handleSubmitOrder(newOrder) {
+    const updated = [newOrder, ...orders];
+    setOrders(updated);
+    try {
+      localStorage.setItem("krishi_buyer_orders", JSON.stringify(updated));
+    } catch (e) {
+      console.warn(e);
+    }
+
+    showToast(`Order request #${newOrder.id} for ${newOrder.crop} submitted! Escrow allocated.`);
+
+    // Try live Supabase insert
     try {
       const supabase = createClient();
-      await createOffer(supabase, {
-        listing_id: selectedListing.id,
-        buyer_id: userId,
-        offered_price: Number(offerForm.price),
-        offered_quantity: Number(offerForm.quantity),
-        notes: offerForm.notes
-      });
-      
-      setSuccessMessage("Offer submitted successfully! The farmer will review it soon.");
-      setSelectedListing(null);
-      setTimeout(() => setSuccessMessage(""), 5000);
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData?.user) {
+        await createBuyerOrder(supabase, {
+          buyer_id: userData.user.id,
+          listing_id: newOrder.listing_id,
+          quantity: newOrder.quantity,
+          unit_price: newOrder.price,
+          total_amount: newOrder.total_amount,
+          status: "pending",
+          pickup_location: newOrder.pickup_location,
+          pickup_date: newOrder.pickup_date,
+          buyer_notes: newOrder.notes,
+        });
+      }
     } catch (err) {
-      console.error("Error submitting offer:", err);
-      setErrorMessage("Failed to submit offer. Please try again.");
-    } finally {
-      setSubmitting(false);
+      console.warn("Supabase order insert skipped:", err);
     }
   }
 
-  if (loading) {
-    return <main className="flex min-h-screen items-center justify-center bg-[#f8faf5] text-emerald-950">Loading your account...</main>;
+  // Handle Search Submission
+  function handleSearchSubmit(e) {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/buyer/browse?query=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push("/buyer/browse");
+    }
   }
 
+  // Order Counts
+  const pendingCount = orders.filter((o) => o.status === "pending").length;
+  const confirmedCount = orders.filter((o) => o.status === "confirmed").length;
+  const readyPickupCount = orders.filter((o) => o.status === "ready_for_pickup").length;
+  const completedCount = orders.filter((o) => o.status === "completed").length;
+
+  // Quick crop filters
+  const cropChips = ["All", "Tomato", "Onion", "Potato", "Wheat", "Chillies", "Mustard"];
+
+  const filteredProduce = produceList.filter((item) => {
+    if (selectedCropFilter === "All") return true;
+    return item.title.toLowerCase().includes(selectedCropFilter.toLowerCase());
+  });
+
   return (
-    <main className="min-h-screen bg-[#f8faf5] px-4 py-10 text-slate-900 sm:px-6">
-      <div className="mx-auto max-w-4xl">
-        <header className="flex items-center justify-between border-b border-slate-200 pb-5">
-          <a href="/" className="text-lg font-bold text-emerald-950">KrishiSetu</a>
-          <button type="button" onClick={handleLogout} className="rounded-xl border border-emerald-900/15 bg-white px-4 py-2 text-sm font-semibold text-emerald-950">Logout</button>
-        </header>
-        
-        {successMessage && (
-          <div className="mt-6 rounded-lg bg-emerald-50 border border-emerald-200 p-4 text-emerald-900">
-            {successMessage}
-          </div>
-        )}
-        
-        <section className="mt-6 rounded-[2rem] bg-emerald-950 p-8 text-amber-100 shadow-sm sm:p-12">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-100/70">Buyer account</p>
-          <h1 className="mt-4 text-3xl font-bold">Welcome, {name}</h1>
-          <p className="mt-3 max-w-xl text-amber-100/80">Find produce directly from farmers, compare asking prices, and plan your next procurement.</p>
-        </section>
-        <section className="mt-8">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-800">Marketplace</p>
-              <h2 className="mt-2 text-2xl font-bold text-emerald-950">Fresh listings</h2>
+    <div className="min-h-screen bg-[#f8faf6] pb-28 text-slate-900">
+      {/* 1. Navbar */}
+      <BuyerHeader
+        name={profile.full_name || "Rahul Sharma"}
+        savedProduceCount={savedProduceIds.length}
+        activeOrdersCount={pendingCount + confirmedCount + readyPickupCount}
+        unreadNotificationsCount={2}
+      />
+
+      {/* Toast Alert */}
+      {toastMessage && (
+        <div className="fixed top-20 right-5 z-50 flex items-center gap-2 rounded-2xl bg-emerald-950 px-5 py-3 text-sm font-bold text-amber-100 shadow-xl border border-emerald-800 animate-slide-in">
+          <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-8">
+        {/* Wireframe Hero Section */}
+        <section className="relative overflow-hidden rounded-[2.5rem] bg-emerald-950 px-6 sm:px-10 py-10 sm:py-12 text-amber-100 shadow-xl shadow-emerald-950/15">
+          <div className="relative z-10 max-w-3xl space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="flex items-center gap-1 rounded-full bg-emerald-900/90 px-3 py-1 text-xs font-semibold text-amber-200 border border-emerald-800">
+                <MapPin className="h-3 w-3 text-amber-300" />
+                {profile.location || "Nashik, Maharashtra"}
+              </span>
+              <span className="flex items-center gap-1 rounded-full bg-emerald-900/90 px-3 py-1 text-xs font-semibold text-emerald-300 border border-emerald-800">
+                <ShieldCheck className="h-3 w-3 text-emerald-400" />
+                100% Escrow Protected
+              </span>
             </div>
-            <span className="text-sm text-slate-500">{listings.length} available</span>
+
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-amber-100">
+              Good morning, {profile.full_name?.split(" ")[0] || "Buyer"}!
+            </h1>
+            <p className="text-base sm:text-lg text-amber-100/80 leading-relaxed max-w-2xl">
+              Find fresh produce directly from verified farmers across Maharashtra with APMC modal price benchmarks.
+            </p>
+
+            {/* Quick Search & Browse Button Bar (Direct Wireframe implementation) */}
+            <form onSubmit={handleSearchSubmit} className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-3.5 h-5 w-5 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search crops, vegetables, grains, or mandi location..."
+                  className="w-full rounded-2xl border-0 bg-white py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 shadow-lg placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                />
+              </div>
+              <button
+                type="submit"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-400 px-6 py-3.5 text-sm font-extrabold text-emerald-950 shadow-lg hover:bg-amber-300 active:scale-95 transition"
+              >
+                <span>Browse Produce</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </form>
           </div>
-          {errorMessage && <p className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">{errorMessage}</p>}
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
-            {listings.map((listing) => (
-              <article key={listing.id} className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div>
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">{listing.category}</p>
-                      <h3 className="mt-2 text-xl font-bold text-emerald-950">{listing.title}</h3>
-                    </div>
-                    <p className="text-lg font-bold text-emerald-950">Rs. {listing.asking_price}<span className="text-xs font-normal text-slate-500"> / {listing.unit}</span></p>
-                  </div>
-                  <p className="mt-4 text-sm text-slate-600">{listing.description || "Direct from the farmer."}</p>
-                  <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold text-slate-600">
-                    <span className="rounded-full bg-emerald-50 px-3 py-1">{listing.quantity_available} {listing.unit} available</span>
-                    <span className="rounded-full bg-amber-50 px-3 py-1">{listing.quality_grade || "Grade pending"}</span>
-                    <span className="rounded-full bg-slate-100 px-3 py-1">{listing.location}</span>
-                  </div>
-                </div>
-                <button type="button" onClick={() => openOfferModal(listing)} className="mt-5 w-full rounded-xl bg-emerald-950 hover:bg-emerald-900 transition-colors px-4 py-3 text-sm font-semibold text-amber-100">Make an offer</button>
-              </article>
+
+          {/* Background Decorative Rings */}
+          <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-emerald-900/40 blur-3xl pointer-events-none" />
+          <div className="absolute right-10 bottom-0 h-48 w-48 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
+        </section>
+
+        {/* Order Status Cards (Pending, Confirmed, Ready, Completed) */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-800">Order Tracking</p>
+              <h2 className="text-2xl font-black text-slate-900">Your Current Orders</h2>
+            </div>
+            <Link
+              href="/buyer/orders"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-900 hover:text-emerald-950 transition"
+            >
+              <span>View All Orders</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <BuyerStats
+            pendingOrders={pendingCount}
+            confirmedOrders={confirmedCount}
+            readyPickupOrders={readyPickupCount}
+            completedOrders={completedCount}
+            loading={loading}
+          />
+        </div>
+
+        {/* Fresh Produce Showcase with Crop Filter Chips */}
+        <section className="space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-800">Marketplace</p>
+              <h2 className="text-2xl font-black text-slate-900">Fresh Produce Near You</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Direct farmgate prices, sorted and graded for commercial procurement.</p>
+            </div>
+
+            <Link
+              href="/buyer/browse"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-xs border border-slate-200/90 hover:bg-slate-50 transition"
+            >
+              <Layers className="h-3.5 w-3.5 text-emerald-700" />
+              <span>Full Marketplace ({produceList.length} items)</span>
+            </Link>
+          </div>
+
+          {/* Wireframe Crop Filter Chips: [Tomato] [Onion] [Potato] [Wheat] ... */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {cropChips.map((crop) => (
+              <button
+                key={crop}
+                type="button"
+                onClick={() => setSelectedCropFilter(crop)}
+                className={`shrink-0 rounded-2xl px-4 py-2 text-xs font-bold transition active:scale-95 ${
+                  selectedCropFilter === crop
+                    ? "bg-emerald-950 text-amber-100 shadow-sm"
+                    : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-100"
+                }`}
+              >
+                {crop === "All" ? "All Crops" : crop}
+              </button>
             ))}
           </div>
-          {!loading && !errorMessage && listings.length === 0 && <p className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-600">No active produce listings yet.</p>}
+
+          {/* Produce Cards Grid */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredProduce.slice(0, 6).map((produce) => (
+              <BuyerProduceCard
+                key={produce.id}
+                {...produce}
+                isSaved={savedProduceIds.includes(produce.id)}
+                onToggleSave={handleToggleSave}
+                onMakeOffer={(item) => setOrderModalListing(item)}
+                onChat={(farmerInfo) => setChatModalFarmer(farmerInfo)}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* Market Prices Highlights (Wireframe Match) */}
+        <section className="rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700">
+                  <TrendingUp className="h-4 w-4" />
+                </span>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900">Market Price Highlights</h2>
+              </div>
+              <p className="mt-1 text-xs text-slate-500">
+                Official APMC modal rates across Nashik, Lasalgaon, and Maharashtra regional mandis.
+              </p>
+            </div>
+
+            <Link
+              href="/buyer/market-prices"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-900/20 bg-emerald-50 px-4 py-2.5 text-xs font-bold text-emerald-950 hover:bg-emerald-100 transition"
+            >
+              <span>View Full APMC Ticker</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          {/* Wireframe Horizontal Highlights: Tomato ₹XX/kg, Onion ₹XX/kg, Potato ₹XX/kg */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            {DEFAULT_MARKET_PRICES.map((mp) => (
+              <div
+                key={mp.id}
+                className="flex flex-col justify-between rounded-2xl bg-slate-50 p-3.5 border border-slate-100 hover:border-emerald-700/40 transition"
+              >
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate block">
+                    {mp.apmc}
+                  </span>
+                  <p className="mt-1 font-extrabold text-sm text-slate-900 leading-tight truncate">
+                    {mp.crop}
+                  </p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-slate-200/60 flex items-baseline justify-between">
+                  <span className="text-base font-black text-emerald-950">
+                    ₹{mp.modal_price}
+                  </span>
+                  <span className="text-[10px] font-bold text-emerald-700">
+                    {mp.trend_pct}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-2xl bg-amber-50/80 border border-amber-200/70 p-4 text-xs text-amber-900 flex items-start gap-2.5">
+            <Sparkles className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+            <p className="leading-relaxed">
+              <strong>KrishiSetu Price Advisory:</strong> Market prices and MSP are provided for reference. Actual transaction prices may vary based on location, quality, quantity and market conditions.
+            </p>
+          </div>
+        </section>
+
+        {/* Quick Actions Footer Card */}
+        <section className="rounded-3xl bg-linear-to-r from-emerald-900 to-emerald-950 p-6 sm:p-8 text-amber-100 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-md">
+          <div className="space-y-1 text-center sm:text-left">
+            <h3 className="text-xl font-black">Need bulk customized produce procurement?</h3>
+            <p className="text-xs sm:text-sm text-amber-100/80">Connect directly with farmer producer groups for guaranteed harvest volume and logistics support.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/buyer/browse"
+              className="rounded-2xl bg-white px-5 py-3 text-xs sm:text-sm font-extrabold text-emerald-950 shadow-md hover:bg-slate-100 transition active:scale-95"
+            >
+              Browse All Listings
+            </Link>
+            <button
+              type="button"
+              onClick={() => setChatModalFarmer({ name: "Ramesh Patil", location: "Nashik", verified: true, crop: "Bulk Harvest Inquiry" })}
+              className="rounded-2xl border border-amber-300/40 bg-emerald-900/60 px-5 py-3 text-xs sm:text-sm font-bold text-amber-200 hover:bg-emerald-900 transition active:scale-95"
+            >
+              Chat with Farmer Hub
+            </button>
+          </div>
         </section>
       </div>
 
-      {/* Offer Modal */}
-      {selectedListing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-slate-900">Make an Offer</h3>
-              <button onClick={() => setSelectedListing(null)} className="text-slate-500 hover:text-slate-800">✕</button>
-            </div>
-            <form onSubmit={submitOffer} className="space-y-4">
-              <div>
-                <p className="text-sm text-slate-600">Negotiating for <strong>{selectedListing.title}</strong></p>
-                <p className="text-xs text-slate-500">Asking price: ₹{selectedListing.asking_price} / {selectedListing.unit}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Your Price (₹ per {selectedListing.unit})</label>
-                <input required type="number" step="0.01" min="1" value={offerForm.price} onChange={e => setOfferForm({...offerForm, price: e.target.value})} className="mt-1 w-full rounded-lg border border-slate-300 p-2 outline-none focus:border-emerald-600" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Quantity ({selectedListing.unit})</label>
-                <input required type="number" step="0.01" max={selectedListing.quantity_available} min="1" value={offerForm.quantity} onChange={e => setOfferForm({...offerForm, quantity: e.target.value})} className="mt-1 w-full rounded-lg border border-slate-300 p-2 outline-none focus:border-emerald-600" />
-                <p className="text-xs text-slate-500 mt-1">Max available: {selectedListing.quantity_available} {selectedListing.unit}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Message for Farmer (Optional)</label>
-                <textarea rows="2" value={offerForm.notes} onChange={e => setOfferForm({...offerForm, notes: e.target.value})} className="mt-1 w-full rounded-lg border border-slate-300 p-2 outline-none focus:border-emerald-600" placeholder="e.g. I will arrange my own transport."></textarea>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setSelectedListing(null)} className="flex-1 rounded-lg border border-slate-300 py-2 text-sm font-semibold text-slate-700">Cancel</button>
-                <button type="submit" disabled={submitting} className="flex-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 transition-colors py-2 text-sm font-semibold text-white disabled:opacity-50">{submitting ? "Sending..." : "Send Offer"}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </main>
+      {/* Floating Bottom Quick Navigation Dock */}
+      <BuyerDock
+        savedCount={savedProduceIds.length}
+        activeOrdersCount={pendingCount + confirmedCount + readyPickupCount}
+        unreadNotificationsCount={2}
+      />
+
+      {/* Direct Order / Make Offer Modal */}
+      <BuyerOrderModal
+        isOpen={Boolean(orderModalListing)}
+        onClose={() => setOrderModalListing(null)}
+        listing={orderModalListing}
+        onSubmitOrder={handleSubmitOrder}
+      />
+
+      {/* Direct Farmer Negotiation Chat Modal */}
+      <BuyerChatModal
+        isOpen={Boolean(chatModalFarmer)}
+        onClose={() => setChatModalFarmer(null)}
+        farmer={chatModalFarmer || {}}
+      />
+    </div>
   );
 }

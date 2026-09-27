@@ -4,6 +4,9 @@ export const metadata = {
   title: "KrishiSetu | Farm-to-Buyer Marketplace",
   description:
     "KrishiSetu connects verified farmers with buyers through transparent market pricing and direct pickup coordination.",
+  icons: {
+    icon: "/icons/krishisetu_logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {

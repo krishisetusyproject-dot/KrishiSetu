@@ -5,29 +5,60 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import BrandLogo from "@/components/BrandLogo";
-import { Menu, X, Plus, LogOut, User, ShoppingBag } from "lucide-react";
+import {
+  Menu,
+  X,
+  ShoppingBag,
+  Heart,
+  Bell,
+  LogOut,
+  User,
+  Search,
+  TrendingUp,
+  Package,
+  LayoutDashboard,
+} from "lucide-react";
 
-export default function FarmerHeader({
-  name = "Ramesh Patil",
+export default function BuyerHeader({
+  name = "Rahul Sharma",
   onLogout,
-  onSellProduce,
-  notificationCount = 0,
-  activeListingsCount,
+  unreadNotificationsCount = 2,
+  savedProduceCount = 2,
+  activeOrdersCount = 3,
 }) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const navItems = [
-    { label: "Dashboard", href: "/farmer" },
-    { label: "Produce", href: "/farmer/produce" },
-    { label: "Buyer Offers", href: "/farmer/offers", badge: notificationCount },
-    { label: "Orders & Pickup", href: "/farmer/orders" },
-    { label: "Live Mandi Rates", href: "/farmer/market-prices" },
+    { label: "Dashboard", href: "/buyer", icon: LayoutDashboard },
+    { label: "Browse Produce", href: "/buyer/browse", icon: Search },
+    {
+      label: "My Orders",
+      href: "/buyer/orders",
+      icon: Package,
+      badge: activeOrdersCount,
+      badgeColor: "bg-sky-600",
+    },
+    {
+      label: "Saved",
+      href: "/buyer/saved",
+      icon: Heart,
+      badge: savedProduceCount,
+      badgeColor: "bg-rose-500",
+    },
+    { label: "Market Prices", href: "/buyer/market-prices", icon: TrendingUp },
+    {
+      label: "Notifications",
+      href: "/buyer/notifications",
+      icon: Bell,
+      badge: unreadNotificationsCount,
+      badgeColor: "bg-amber-500",
+    },
   ];
 
   function isActive(href) {
-    if (href === "/farmer") return pathname === "/farmer";
+    if (href === "/buyer") return pathname === "/buyer";
     return pathname.startsWith(href);
   }
 
@@ -41,31 +72,23 @@ export default function FarmerHeader({
     router.replace("/");
   }
 
-  function handleSellClick() {
-    if (onSellProduce) {
-      onSellProduce();
-    } else {
-      router.push("/farmer/produce?action=new");
-    }
-  }
-
-  const initial = (name || "F").trim().charAt(0).toUpperCase();
+  const initial = (name || "B").trim().charAt(0).toUpperCase();
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-slate-50/95 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
         {/* Brand */}
-        <Link href="/farmer" className="flex items-center gap-3 group">
+        <Link href="/buyer" className="flex items-center gap-3 group">
           <BrandLogo
             className="h-11 w-auto transition-transform group-hover:scale-[1.02]"
             nameClassName="text-lg font-extrabold text-emerald-950"
-            subtitle="Farmer Portal"
+            subtitle="Buyer Portal"
             subtitleClassName="text-[11px] font-medium text-slate-500"
           />
         </Link>
 
         {/* Center Nav Links */}
-        <nav className="hidden items-center gap-6 xl:gap-8 lg:flex">
+        <nav className="hidden items-center gap-5 xl:gap-7 lg:flex">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
@@ -80,7 +103,11 @@ export default function FarmerHeader({
               >
                 <span>{item.label}</span>
                 {Boolean(item.badge && item.badge > 0) && (
-                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold text-white">
+                  <span
+                    className={`flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold text-white ${
+                      item.badgeColor || "bg-amber-500"
+                    }`}
+                  >
                     {item.badge}
                   </span>
                 )}
@@ -90,20 +117,20 @@ export default function FarmerHeader({
         </nav>
 
         {/* Right Actions */}
-        <div className="hidden items-center gap-3.5 lg:flex">
-          <button
-            onClick={handleSellClick}
+        <div className="hidden items-center gap-3 lg:flex">
+          <Link
+            href="/buyer/browse"
             className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950 px-4 py-2 text-xs sm:text-sm font-bold text-amber-100 shadow-sm shadow-emerald-950/10 hover:bg-emerald-900 active:scale-95 transition-all"
           >
-            <Plus className="h-4 w-4" />
-            <span>Sell Produce</span>
-          </button>
+            <Search className="h-4 w-4" />
+            <span>Browse Produce</span>
+          </Link>
 
           {/* User Profile Pill */}
           <Link
-            href="/farmer/profile"
+            href="/buyer/profile"
             className={`flex items-center gap-2.5 rounded-full border bg-white px-3 py-1.5 shadow-xs hover:bg-slate-50 transition ${
-              pathname === "/farmer/profile"
+              pathname === "/buyer/profile"
                 ? "border-emerald-700 ring-2 ring-emerald-600/20"
                 : "border-slate-200"
             }`}
@@ -155,9 +182,16 @@ export default function FarmerHeader({
                       : "font-medium text-slate-700 hover:bg-slate-100"
                   }`}
                 >
-                  <span>{item.label}</span>
+                  <div className="flex items-center gap-2.5">
+                    <item.icon className="h-4 w-4 opacity-75" />
+                    <span>{item.label}</span>
+                  </div>
                   {Boolean(item.badge && item.badge > 0) && (
-                    <span className="rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-bold text-white ${
+                        item.badgeColor || "bg-amber-500"
+                      }`}
+                    >
                       {item.badge}
                     </span>
                   )}
@@ -167,19 +201,17 @@ export default function FarmerHeader({
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-200 space-y-2.5">
-            <button
-              onClick={() => {
-                setOpen(false);
-                handleSellClick();
-              }}
+            <Link
+              href="/buyer/browse"
+              onClick={() => setOpen(false)}
               className="w-full flex items-center justify-center gap-1.5 rounded-full bg-emerald-950 px-4 py-2.5 text-sm font-bold text-amber-100 shadow-sm"
             >
-              <Plus className="h-4 w-4" />
-              <span>Sell Produce</span>
-            </button>
+              <Search className="h-4 w-4" />
+              <span>Browse Produce</span>
+            </Link>
 
             <Link
-              href="/farmer/profile"
+              href="/buyer/profile"
               onClick={() => setOpen(false)}
               className="flex items-center justify-between rounded-2xl bg-white border border-slate-200 px-4 py-2.5 text-sm"
             >

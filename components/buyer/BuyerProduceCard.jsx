@@ -1,0 +1,200 @@
+"use client";
+
+import { Heart, MapPin, User, ShieldCheck, ArrowRight, Sparkles, Scale, MessageSquare } from "lucide-react";
+
+export default function BuyerProduceCard({
+  id,
+  title = "Tomato",
+  category = "Vegetables",
+  variety = "Hybrid",
+  listedPrice = 24,
+  unit = "kg",
+  quantityAvailable = 500,
+  marketReference = "₹22–26 / kg",
+  farmerName = "Ramesh Patil",
+  farmerVerified = true,
+  location = "Nashik",
+  qualityGrade = "A+ Premium",
+  harvestDate = "Immediate",
+  organic = false,
+  imageUrl,
+  isSaved = false,
+  onToggleSave,
+  onMakeOffer,
+  onChat,
+}) {
+  const defaultCropImages = {
+    tomato: "/icons/tomatoes.jpg",
+    onion: "/icons/fresh_produce.png",
+    wheat: "/icons/wheat_crop.png",
+    chilli: "/icons/green_chillies.jpg",
+    mustard: "/icons/mustard_seeds.jpg",
+    default: "/icons/fresh_produce.png",
+  };
+
+  const cropLower = (title || "").toLowerCase();
+  let resolvedImage = imageUrl;
+  if (!resolvedImage) {
+    if (cropLower.includes("tomato")) resolvedImage = defaultCropImages.tomato;
+    else if (cropLower.includes("chili") || cropLower.includes("chill") || cropLower.includes("mirch"))
+      resolvedImage = defaultCropImages.chilli;
+    else if (cropLower.includes("mustard") || cropLower.includes("sarson"))
+      resolvedImage = defaultCropImages.mustard;
+    else if (cropLower.includes("wheat") || cropLower.includes("gehu") || cropLower.includes("grain"))
+      resolvedImage = defaultCropImages.wheat;
+    else resolvedImage = defaultCropImages.default;
+  }
+
+  return (
+    <article className="group flex flex-col justify-between overflow-hidden rounded-[2rem] border border-slate-200/90 bg-white shadow-xs hover:shadow-md transition-all duration-300">
+      {/* Produce Image Header */}
+      <div className="relative h-52 sm:h-56 overflow-hidden bg-slate-100">
+        <img
+          src={resolvedImage}
+          alt={title}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+
+        {/* Top Badges */}
+        <div className="absolute top-3.5 left-3.5 flex flex-wrap gap-1.5">
+          <span className="rounded-full bg-emerald-950/80 backdrop-blur-sm px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-100">
+            {qualityGrade || "Grade A"}
+          </span>
+          {organic && (
+            <span className="rounded-full bg-emerald-600/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold text-white">
+              Organic
+            </span>
+          )}
+        </div>
+
+        {/* Wishlist Heart Toggle */}
+        <button
+          type="button"
+          onClick={() => onToggleSave && onToggleSave(id)}
+          title={isSaved ? "Remove from Saved" : "Save to Wishlist"}
+          aria-label="Save produce"
+          className="absolute top-3.5 right-3.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-md backdrop-blur-sm transition-all hover:bg-white active:scale-90"
+        >
+          <Heart
+            className={`h-4 w-4 transition-colors ${
+              isSaved ? "fill-rose-500 text-rose-500" : "text-slate-600 hover:text-rose-500"
+            }`}
+          />
+        </button>
+
+        {/* Harvest Date Tag at Bottom Image */}
+        <div className="absolute bottom-2.5 left-3.5">
+          <span className="rounded-lg bg-black/60 backdrop-blur-xs px-2.5 py-0.5 text-[10px] font-semibold text-white">
+            Harvest: {harvestDate}
+          </span>
+        </div>
+      </div>
+
+      {/* Body Content */}
+      <div className="flex flex-col flex-1 p-5 sm:p-6 space-y-4">
+        {/* Title and Category */}
+        <div>
+          <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 group-hover:text-emerald-950 transition-colors">
+            {title}
+          </h3>
+          <p className="mt-0.5 text-xs text-slate-500">
+            {variety ? `${variety} • ` : ""}
+            <span className="font-semibold text-slate-600">{category}</span>
+          </p>
+        </div>
+
+        {/* Farmer & Location Info */}
+        <div className="rounded-2xl bg-slate-50 p-3 text-xs space-y-1.5 border border-slate-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 font-bold text-slate-900">
+              <User className="h-3.5 w-3.5 text-slate-500" />
+              <span>{farmerName}</span>
+            </div>
+            {farmerVerified && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700">
+                <ShieldCheck className="h-3 w-3" />
+                Verified
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1.5 text-slate-500">
+            <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+            <span className="truncate">{location}</span>
+          </div>
+        </div>
+
+        {/* Quantity Available */}
+        <div className="flex items-center justify-between text-xs font-semibold text-slate-700 px-1">
+          <span className="flex items-center gap-1 text-slate-500">
+            <Scale className="h-3.5 w-3.5 text-slate-400" /> Available Stock:
+          </span>
+          <span className="text-slate-900 font-bold">
+            {quantityAvailable?.toLocaleString()} {unit}
+          </span>
+        </div>
+
+        {/* Price & Market Reference Comparison */}
+        <div className="rounded-2xl bg-emerald-50/80 p-3.5 border border-emerald-100/80 space-y-1">
+          <div className="flex items-baseline justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900">
+              Listed Price
+            </span>
+            <span className="text-xl font-black text-emerald-950">
+              ₹{listedPrice}{" "}
+              <span className="text-xs font-medium text-emerald-800">/ {unit}</span>
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between pt-1 border-t border-emerald-200/50 text-[11px]">
+            <span className="text-slate-500 flex items-center gap-1 font-medium">
+              <Sparkles className="h-3 w-3 text-amber-500" /> Market Ref:
+            </span>
+            <span className="font-bold text-slate-700">{marketReference}</span>
+          </div>
+        </div>
+
+        {/* Make Offer / Direct Buy Action Button & Chat */}
+        <div className="pt-1 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() =>
+              onMakeOffer &&
+              onMakeOffer({
+                id,
+                title,
+                farmerName,
+                location,
+                listedPrice,
+                unit,
+                quantityAvailable,
+              })
+            }
+            className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-950 px-3.5 py-3 text-xs sm:text-sm font-bold text-amber-100 shadow-sm hover:bg-emerald-900 active:scale-95 transition-all"
+          >
+            <span>Place Order / Offer</span>
+            <ArrowRight className="h-4 w-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              onChat &&
+              onChat({
+                name: farmerName,
+                location: location,
+                verified: farmerVerified,
+                crop: title,
+                produceId: id,
+              })
+            }
+            title="Chat with Farmer"
+            aria-label="Chat with Farmer"
+            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-emerald-900/20 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 hover:text-emerald-950 active:scale-95 transition-all shadow-xs"
+          >
+            <MessageSquare className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+}

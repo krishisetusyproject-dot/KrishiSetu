@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import BrandLogo from "@/components/BrandLogo";
 import { createClient } from "@/lib/supabase/client";
 
 const initialForm = {
@@ -138,7 +139,9 @@ export default function RegisterPage() {
   return (
     <main className="min-h-screen bg-[#f8faf5] px-4 py-10 text-slate-900 sm:px-6">
       <div className="mx-auto max-w-3xl">
-        <a href="/" className="text-sm font-semibold text-emerald-950">KrishiSetu</a>
+        <a href="/" aria-label="KrishiSetu home" className="inline-flex">
+          <BrandLogo className="h-10 w-auto" nameClassName="text-lg font-semibold text-emerald-950" />
+        </a>
         <div className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
           <h1 className="text-3xl font-bold text-emerald-950">Join KrishiSetu</h1>
           <p className="mt-2 max-w-xl text-slate-600">Connect directly with buyers and sell your agricultural produce with greater transparency.</p>

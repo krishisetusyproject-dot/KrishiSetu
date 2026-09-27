@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import BrandLogo from "@/components/BrandLogo";
 import { createClient } from "@/lib/supabase/client";
 
 const initialForm = {
@@ -147,8 +148,8 @@ export default function BuyerRegisterPage() {
     <main className="min-h-screen bg-[#f7f8f3] px-4 py-10">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 text-center">
-          <div className="mb-3 inline-flex items-center rounded-full bg-[#003f32] px-4 py-2 text-sm font-medium text-white">
-            KrishiSetu
+          <div className="mb-3 flex justify-center">
+            <BrandLogo className="h-12 w-auto" nameClassName="text-lg font-semibold text-emerald-950" />
           </div>
 
           <h1 className="text-3xl font-bold text-[#12372a] sm:text-4xl">Create Your Buyer Account</h1>
