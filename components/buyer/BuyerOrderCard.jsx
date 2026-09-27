@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, Calendar, ShieldCheck, CheckCircle2, Truck, Clock, XCircle, MapPin, Phone, MessageSquare } from "lucide-react";
+import { Building2, Calendar, ShieldCheck, CheckCircle2, Truck, Clock, XCircle, MapPin, Phone, MessageSquare, Award } from "lucide-react";
 
 export default function BuyerOrderCard({
   id = "ORD-8941",
