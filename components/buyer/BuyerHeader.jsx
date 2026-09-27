@@ -32,7 +32,6 @@ export default function BuyerHeader({
 
   const navItems = useMemo(() => [
     { label: "Dashboard", href: "/buyer", icon: LayoutDashboard },
-    { label: "Browse Produce", href: "/buyer/browse", icon: Search },
     {
       label: "My Orders",
       href: "/buyer/orders",
@@ -79,17 +78,17 @@ export default function BuyerHeader({
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-slate-50/95 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
         {/* Brand */}
-        <Link href="/buyer" className="flex items-center gap-3 group">
+        <Link href="/buyer" className="flex items-center gap-3 group shrink-0">
           <BrandLogo
             className="h-11 w-auto transition-transform group-hover:scale-[1.02]"
-            nameClassName="text-lg font-extrabold text-emerald-950"
+            nameClassName="text-lg font-extrabold text-emerald-950 whitespace-nowrap"
             subtitle="Buyer Portal"
-            subtitleClassName="text-[11px] font-medium text-slate-500"
+            subtitleClassName="text-[11px] font-medium text-slate-500 whitespace-nowrap"
           />
         </Link>
 
         {/* Center Nav Links */}
-        <nav className="hidden items-center gap-5 xl:gap-7 lg:flex">
+        <nav className="hidden items-center gap-3 xl:gap-6 lg:flex">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
