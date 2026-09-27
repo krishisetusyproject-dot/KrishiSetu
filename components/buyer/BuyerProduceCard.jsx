@@ -1,8 +1,43 @@
 "use client";
 
-import { Heart, MapPin, User, ShieldCheck, ArrowRight, Sparkles, Scale, MessageSquare } from "lucide-react";
+import { memo } from "react";
+import Image from "next/image";
+import {
+  Heart,
+  MapPin,
+  User,
+  ShieldCheck,
+  ArrowRight,
+  Sparkles,
+  Scale,
+  MessageSquare,
+} from "lucide-react";
 
-export default function BuyerProduceCard({
+// Static lookup — defined outside component so it's allocated once
+const CROP_IMAGES = {
+  tomato: "/icons/tomatoes.jpg",
+  chilli: "/icons/green_chillies.jpg",
+  chill: "/icons/green_chillies.jpg",
+  mirch: "/icons/green_chillies.jpg",
+  mustard: "/icons/mustard_seeds.jpg",
+  sarson: "/icons/mustard_seeds.jpg",
+  wheat: "/icons/wheat_crop.png",
+  gehu: "/icons/wheat_crop.png",
+  grain: "/icons/wheat_crop.png",
+};
+const DEFAULT_IMAGE = "/icons/fresh_produce.png";
+
+function resolveImage(title, imageUrl) {
+  if (imageUrl) return imageUrl;
+  const lower = (title || "").toLowerCase();
+  for (const [key, path] of Object.entries(CROP_IMAGES)) {
+    if (lower.includes(key)) return path;
+  }
+  return DEFAULT_IMAGE;
+}
+
+// memo: prevents re-renders when parent list state (savedIds, toast) changes
+const BuyerProduceCard = memo(function BuyerProduceCard({
   id,
   title = "Tomato",
   category = "Vegetables",
@@ -23,36 +58,18 @@ export default function BuyerProduceCard({
   onMakeOffer,
   onChat,
 }) {
-  const defaultCropImages = {
-    tomato: "/icons/tomatoes.jpg",
-    onion: "/icons/fresh_produce.png",
-    wheat: "/icons/wheat_crop.png",
-    chilli: "/icons/green_chillies.jpg",
-    mustard: "/icons/mustard_seeds.jpg",
-    default: "/icons/fresh_produce.png",
-  };
-
-  const cropLower = (title || "").toLowerCase();
-  let resolvedImage = imageUrl;
-  if (!resolvedImage) {
-    if (cropLower.includes("tomato")) resolvedImage = defaultCropImages.tomato;
-    else if (cropLower.includes("chili") || cropLower.includes("chill") || cropLower.includes("mirch"))
-      resolvedImage = defaultCropImages.chilli;
-    else if (cropLower.includes("mustard") || cropLower.includes("sarson"))
-      resolvedImage = defaultCropImages.mustard;
-    else if (cropLower.includes("wheat") || cropLower.includes("gehu") || cropLower.includes("grain"))
-      resolvedImage = defaultCropImages.wheat;
-    else resolvedImage = defaultCropImages.default;
-  }
+  const resolvedImage = resolveImage(title, imageUrl);
 
   return (
     <article className="group flex flex-col justify-between overflow-hidden rounded-[2rem] border border-slate-200/90 bg-white shadow-xs hover:shadow-md transition-all duration-300">
       {/* Produce Image Header */}
       <div className="relative h-52 sm:h-56 overflow-hidden bg-slate-100">
-        <img
+        <Image
           src={resolvedImage}
           alt={title}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          fill
+          className="object-cover transition duration-500 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
 
         {/* Top Badges */}
@@ -82,7 +99,7 @@ export default function BuyerProduceCard({
           />
         </button>
 
-        {/* Harvest Date Tag at Bottom Image */}
+        {/* Harvest Date Tag */}
         <div className="absolute bottom-2.5 left-3.5">
           <span className="rounded-lg bg-black/60 backdrop-blur-xs px-2.5 py-0.5 text-[10px] font-semibold text-white">
             Harvest: {harvestDate}
@@ -92,7 +109,6 @@ export default function BuyerProduceCard({
 
       {/* Body Content */}
       <div className="flex flex-col flex-1 p-5 sm:p-6 space-y-4">
-        {/* Title and Category */}
         <div>
           <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 group-hover:text-emerald-950 transition-colors">
             {title}
@@ -133,7 +149,7 @@ export default function BuyerProduceCard({
           </span>
         </div>
 
-        {/* Price & Market Reference Comparison */}
+        {/* Price & Market Reference */}
         <div className="rounded-2xl bg-emerald-50/80 p-3.5 border border-emerald-100/80 space-y-1">
           <div className="flex items-baseline justify-between">
             <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900">
@@ -153,21 +169,13 @@ export default function BuyerProduceCard({
           </div>
         </div>
 
-        {/* Make Offer / Direct Buy Action Button & Chat */}
+        {/* Action Buttons */}
         <div className="pt-1 flex items-center gap-2">
           <button
             type="button"
             onClick={() =>
               onMakeOffer &&
-              onMakeOffer({
-                id,
-                title,
-                farmerName,
-                location,
-                listedPrice,
-                unit,
-                quantityAvailable,
-              })
+              onMakeOffer({ id, title, farmerName, location, listedPrice, unit, quantityAvailable })
             }
             className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-950 px-3.5 py-3 text-xs sm:text-sm font-bold text-amber-100 shadow-sm hover:bg-emerald-900 active:scale-95 transition-all"
           >
@@ -179,13 +187,7 @@ export default function BuyerProduceCard({
             type="button"
             onClick={() =>
               onChat &&
-              onChat({
-                name: farmerName,
-                location: location,
-                verified: farmerVerified,
-                crop: title,
-                produceId: id,
-              })
+              onChat({ name: farmerName, location, verified: farmerVerified, crop: title, produceId: id })
             }
             title="Chat with Farmer"
             aria-label="Chat with Farmer"
@@ -197,4 +199,6 @@ export default function BuyerProduceCard({
       </div>
     </article>
   );
-}
+});
+
+export default BuyerProduceCard;

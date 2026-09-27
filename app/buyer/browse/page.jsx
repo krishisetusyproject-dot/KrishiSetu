@@ -62,12 +62,16 @@ function BrowseContent() {
       const { data: userData } = await supabase.auth.getUser();
 
       try {
-        if (userData?.user) {
-          const userProfile = await getUserProfile(supabase, userData.user.id);
-          if (userProfile) setProfile({ ...DEFAULT_BUYER_PROFILE, ...userProfile });
-        }
+        // Parallel: fetch profile and listings simultaneously
+        const [userProfile, dbListings] = await Promise.all([
+          userData?.user
+            ? getUserProfile(supabase, userData.user.id).catch(() => null)
+            : Promise.resolve(null),
+          getActiveListings(supabase).catch(() => []),
+        ]);
 
-        const dbListings = await getActiveListings(supabase).catch(() => []);
+        if (userProfile) setProfile({ ...DEFAULT_BUYER_PROFILE, ...userProfile });
+
         if (dbListings && dbListings.length > 0) {
           const mapped = dbListings.map((l) => ({
             id: l.id,

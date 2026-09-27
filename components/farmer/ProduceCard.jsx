@@ -1,8 +1,34 @@
 "use client";
 
-import { Eye, Trash2, Pause, Play } from "lucide-react";
+import { memo } from "react";
+import Image from "next/image";
+import { Trash2 } from "lucide-react";
 
-export default function ProduceCard({
+// Defined outside component so it's never re-created on re-renders
+const CROP_IMAGES = {
+  tomato: "/icons/tomatoes.jpg",
+  chilli: "/icons/green_chillies.jpg",
+  chill: "/icons/green_chillies.jpg",
+  mirch: "/icons/green_chillies.jpg",
+  mustard: "/icons/mustard_seeds.jpg",
+  sarson: "/icons/mustard_seeds.jpg",
+  wheat: "/icons/wheat_crop.png",
+  gehu: "/icons/wheat_crop.png",
+  grain: "/icons/wheat_crop.png",
+};
+const DEFAULT_IMAGE = "/icons/fresh_produce.png";
+
+function resolveImage(title, imageUrl) {
+  if (imageUrl) return imageUrl;
+  const lower = (title || "").toLowerCase();
+  for (const [key, path] of Object.entries(CROP_IMAGES)) {
+    if (lower.includes(key)) return path;
+  }
+  return DEFAULT_IMAGE;
+}
+
+// memo prevents unnecessary re-renders when parent state changes (e.g. toast messages)
+const ProduceCard = memo(function ProduceCard({
   id,
   title,
   variety,
@@ -18,36 +44,17 @@ export default function ProduceCard({
   onDelete,
 }) {
   const isPaused = status === "paused";
-
-  const defaultCropImages = {
-    tomato: "/icons/tomatoes.jpg",
-    onion: "/icons/wheat_crop.png",
-    wheat: "/icons/wheat_crop.png",
-    chilli: "/icons/green_chillies.jpg",
-    mustard: "/icons/mustard_seeds.jpg",
-    default: "/icons/fresh_produce.png",
-  };
-
-  const cropName = (title || "").toLowerCase();
-  let resolvedImage = imageUrl;
-  if (!resolvedImage) {
-    if (cropName.includes("tomato")) resolvedImage = defaultCropImages.tomato;
-    else if (cropName.includes("chili") || cropName.includes("chill") || cropName.includes("mirch"))
-      resolvedImage = defaultCropImages.chilli;
-    else if (cropName.includes("mustard") || cropName.includes("sarson"))
-      resolvedImage = defaultCropImages.mustard;
-    else if (cropName.includes("wheat") || cropName.includes("gehu") || cropName.includes("grain"))
-      resolvedImage = defaultCropImages.wheat;
-    else resolvedImage = defaultCropImages.default;
-  }
+  const resolvedImage = resolveImage(title, imageUrl);
 
   return (
     <article className="overflow-hidden rounded-[2rem] border border-slate-200/90 bg-white shadow-sm shadow-slate-900/5 transition hover:shadow-md">
       <div className="relative h-56 overflow-hidden bg-slate-100">
-        <img
+        <Image
           src={resolvedImage}
-          alt={title}
-          className="h-full w-full object-cover transition duration-500 hover:scale-105"
+          alt={title || "Produce"}
+          fill
+          className="object-cover transition duration-500 hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
         <div className="absolute top-4 right-4">
           <span
@@ -84,7 +91,6 @@ export default function ProduceCard({
           </p>
         </div>
 
-        {/* Asking price block */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-slate-50 px-4 py-3">
           <div>
             <p className="text-xs text-slate-500">Your Asking Price</p>
@@ -100,7 +106,6 @@ export default function ProduceCard({
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex items-center gap-2 pt-2">
           {onToggleStatus && (
             <button
@@ -124,4 +129,6 @@ export default function ProduceCard({
       </div>
     </article>
   );
-}
+});
+
+export default ProduceCard;

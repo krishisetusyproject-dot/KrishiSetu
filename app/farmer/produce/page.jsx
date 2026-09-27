@@ -52,16 +52,17 @@ function ProduceInventoryContent() {
       }
 
       try {
-        const userProfile = await getUserProfile(supabase, userData.user.id);
-        if (userProfile) {
-          setProfile(userProfile);
-        }
+        // Parallel: both requests fire simultaneously
+        const [userProfile, dbListings] = await Promise.all([
+          getUserProfile(supabase, userData.user.id).catch(() => null),
+          getFarmerListings(supabase, userData.user.id).catch(() => []),
+        ]);
 
-        const dbListings = await getFarmerListings(supabase, userData.user.id);
+        if (userProfile) setProfile(userProfile);
+
         if (dbListings && dbListings.length > 0) {
           setListings(dbListings);
         } else {
-          // Provide default showcase listings matching reference image
           setListings(DEFAULT_PRODUCE_LISTINGS);
         }
       } catch (err) {

@@ -9,9 +9,25 @@ export const metadata = {
   },
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#064e3b",
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* Preconnect to Supabase to reduce DNS+TLS overhead on first API call */}
+        <link
+          rel="preconnect"
+          href={process.env.NEXT_PUBLIC_SUPABASE_URL
+            ?.replace(/\/rest\/v1\/?$/, "")
+            .replace(/\/+$/, "")}
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

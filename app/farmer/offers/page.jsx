@@ -42,10 +42,14 @@ export default function BuyerOffersPage() {
       }
 
       try {
-        const userProfile = await getUserProfile(supabase, userData.user.id);
+        // Parallel: both requests fire simultaneously
+        const [userProfile, dbOffers] = await Promise.all([
+          getUserProfile(supabase, userData.user.id).catch(() => null),
+          getFarmerOffers(supabase, userData.user.id).catch(() => []),
+        ]);
+
         if (userProfile) setProfile(userProfile);
 
-        const dbOffers = await getFarmerOffers(supabase, userData.user.id);
         if (dbOffers && dbOffers.length > 0) {
           const normalized = dbOffers.map((o) => ({
             id: o.id,

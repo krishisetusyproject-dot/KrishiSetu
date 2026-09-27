@@ -75,18 +75,19 @@ export default function BuyerDashboardPage() {
       }
 
       try {
-        const userProfile = await getUserProfile(supabase, userData.user.id);
+        // Parallel fetch: profile, listings, and orders all fire at the same time
+        const [userProfile, dbListings, dbOrders] = await Promise.all([
+          getUserProfile(supabase, userData.user.id).catch(() => null),
+          getActiveListings(supabase).catch(() => []),
+          getBuyerOrders(supabase, userData.user.id).catch(() => []),
+        ]);
+
         if (userProfile) {
           setProfile({
             ...DEFAULT_BUYER_PROFILE,
             ...userProfile,
           });
         }
-
-        const [dbListings, dbOrders] = await Promise.all([
-          getActiveListings(supabase).catch(() => []),
-          getBuyerOrders(supabase, userData.user.id).catch(() => []),
-        ]);
 
         if (dbListings && dbListings.length > 0) {
           const mapped = dbListings.map((l) => ({

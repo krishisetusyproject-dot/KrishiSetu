@@ -1,15 +1,22 @@
 import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 export default function Hero() {
   return (
     <section id="home" className="relative overflow-hidden bg-[#f3f6ed]">
       <div className="relative mx-auto max-w-[1600px] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
         <div className="relative overflow-hidden rounded-[2rem] border border-white/40 bg-[#eef6ea] shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-          <img
-            src="/icons/farmer_with_laptop.jpg"
-            alt="Farmer using laptop"
-            className="h-[620px] w-full object-cover object-center md:h-[700px] lg:h-[760px]"
-          />
+          {/* LCP image: priority + fill for proper Next.js optimization */}
+          <div className="relative h-[620px] w-full md:h-[700px] lg:h-[760px]">
+            <Image
+              src="/icons/farmer_with_laptop.jpg"
+              alt="Farmer using KrishiSetu platform"
+              fill
+              className="object-cover object-center"
+              priority
+              sizes="100vw"
+            />
+          </div>
 
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.45),rgba(255,255,255,0.18)_38%,rgba(19,54,26,0.12))]" />
 
@@ -23,7 +30,8 @@ export default function Hero() {
                 </h1>
 
                 <p className="mt-6 max-w-[620px] text-base leading-8 text-[#1e293b] sm:text-xl">
-                  KrishiSetu helps farmers find verified buyers and helps buyers source fresh produce directly from farms.
+                  KrishiSetu helps farmers find verified buyers and helps buyers
+                  source fresh produce directly from farms.
                 </p>
 
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -35,7 +43,7 @@ export default function Hero() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </a>
                   <a
-                    href="http://localhost:3000/register"
+                    href="/register"
                     className="inline-flex items-center justify-center rounded-full border border-[#1a2d24]/10 bg-white/75 px-6 py-3 text-base font-semibold text-[#1b120d] shadow-sm shadow-slate-900/5 backdrop-blur-sm transition hover:bg-white"
                   >
                     Sell Your Produce

@@ -56,7 +56,14 @@ export default function FarmerDashboard() {
       }
 
       try {
-        const userProfile = await getUserProfile(supabase, userData.user.id);
+        // Parallel fetch: all 4 requests fire simultaneously
+        const [userProfile, dbListings, dbOffers, dbOrders] = await Promise.all([
+          getUserProfile(supabase, userData.user.id).catch(() => null),
+          getFarmerListings(supabase, userData.user.id).catch(() => []),
+          getFarmerOffers(supabase, userData.user.id).catch(() => []),
+          getFarmerOrders(supabase, userData.user.id).catch(() => []),
+        ]);
+
         if (userProfile) {
           setProfile({
             ...DEFAULT_FARMER_PROFILE,
@@ -66,12 +73,6 @@ export default function FarmerDashboard() {
               : DEFAULT_FARMER_PROFILE.kisan_id,
           });
         }
-
-        const [dbListings, dbOffers, dbOrders] = await Promise.all([
-          getFarmerListings(supabase, userData.user.id).catch(() => []),
-          getFarmerOffers(supabase, userData.user.id).catch(() => []),
-          getFarmerOrders(supabase, userData.user.id).catch(() => []),
-        ]);
 
         if (dbListings && dbListings.length > 0) {
           setListings(dbListings);

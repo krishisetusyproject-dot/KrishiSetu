@@ -35,12 +35,14 @@ export default function FarmerOrdersPage() {
       }
 
       try {
-        const userProfile = await getUserProfile(supabase, userData.user.id);
-        if (userProfile) {
-          setProfile(userProfile);
-        }
+        // Parallel: both requests fire simultaneously
+        const [userProfile, dbOrders] = await Promise.all([
+          getUserProfile(supabase, userData.user.id).catch(() => null),
+          getFarmerOrders(supabase, userData.user.id).catch(() => []),
+        ]);
 
-        const dbOrders = await getFarmerOrders(supabase, userData.user.id);
+        if (userProfile) setProfile(userProfile);
+
         if (dbOrders && dbOrders.length > 0) {
           // Normalize DB orders to card structure
           const normalized = dbOrders.map((o) => ({

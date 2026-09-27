@@ -17,6 +17,8 @@ html {
 body {
   @apply bg-slate-50 text-slate-900 antialiased;
   min-height: 100vh;
+  /* Prevent layout shift from scrollbar appearing/disappearing */
+  overflow-y: scroll;
 }
 
 * {
@@ -26,6 +28,9 @@ body {
 img {
   max-width: 100%;
   display: block;
+  /* Prevent accidental drag */
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 ::selection {
@@ -42,4 +47,21 @@ button:focus-visible,
 a:focus-visible {
   outline: 2px solid #4f7a3f;
   outline-offset: 4px;
+}
+
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* GPU hint for card hover animations — avoids paint on transform */
+article {
+  will-change: auto;
+}
+article:hover {
+  will-change: box-shadow;
 }
