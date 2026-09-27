@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, Suspense } from "react";
+import { useEffect, useState, useMemo, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProfile } from "@/lib/services/profiles";
@@ -19,6 +19,8 @@ import SellProduceModal from "@/components/farmer/SellProduceModal";
 import EmptyState from "@/components/farmer/EmptyState";
 import { Search, Plus, LayoutGrid, List, SlidersHorizontal, CheckCircle2 } from "lucide-react";
 
+const categories = ["All", "Vegetables", "Grains & Cereals", "Fruits", "Pulses"];
+
 function ProduceInventoryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,8 +33,6 @@ function ProduceInventoryContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [toastMessage, setToastMessage] = useState("");
-
-  const categories = ["All", "Vegetables", "Grains & Cereals", "Fruits", "Pulses"];
 
   useEffect(() => {
     if (searchParams.get("action") === "new") {
@@ -76,13 +76,13 @@ function ProduceInventoryContent() {
     loadData();
   }, [router]);
 
-  async function handleLogout() {
+  const handleLogout = useCallback(async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.replace("/");
-  }
+  }, [router]);
 
-  async function handleCreateProduce(formData) {
+  const handleCreateProduce = useCallback(async (formData) => {
     try {
       const supabase = createClient();
       const { data: userData } = await supabase.auth.getUser();
@@ -119,9 +119,9 @@ function ProduceInventoryContent() {
       setToastMessage("Saved to local catalog.");
       setTimeout(() => setToastMessage(""), 4000);
     }
-  }
+  }, [profile]);
 
-  async function handleToggleStatus(listingId, newStatus) {
+  const handleToggleStatus = useCallback(async (listingId, newStatus) => {
     try {
       const supabase = createClient();
       await updateListingStatus(supabase, listingId, newStatus).catch(() => null);
@@ -133,9 +133,9 @@ function ProduceInventoryContent() {
     } catch (err) {
       console.error(err);
     }
-  }
+  }, []);
 
-  async function handleDelete(listingId) {
+  const handleDelete = useCallback(async (listingId) => {
     if (!confirm("Are you sure you want to remove this produce listing?")) return;
     try {
       const supabase = createClient();
@@ -146,7 +146,7 @@ function ProduceInventoryContent() {
     } catch (err) {
       console.error(err);
     }
-  }
+  }, []);
 
   const safeListings = Array.isArray(listings) ? listings : [];
 

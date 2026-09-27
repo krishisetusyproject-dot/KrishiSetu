@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProfile } from "@/lib/services/profiles";
@@ -84,13 +84,13 @@ export default function BuyerOffersPage() {
     loadOffers();
   }, [router]);
 
-  async function handleLogout() {
+  const handleLogout = useCallback(async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.replace("/");
-  }
+  }, [router]);
 
-  async function handleAccept(offerId) {
+  const handleAccept = useCallback(async (offerId) => {
     setActionId(offerId);
     try {
       const supabase = createClient();
@@ -114,9 +114,9 @@ export default function BuyerOffersPage() {
     } finally {
       setActionId(null);
     }
-  }
+  }, []);
 
-  async function handleReject(offerId) {
+  const handleReject = useCallback(async (offerId) => {
     setActionId(offerId);
     try {
       const supabase = createClient();
@@ -133,10 +133,10 @@ export default function BuyerOffersPage() {
     } finally {
       setActionId(null);
     }
-  }
+  }, []);
 
   const safeOffers = Array.isArray(offers) ? offers : [];
-  const pendingCount = safeOffers.filter((o) => o?.status === "pending").length;
+  const pendingCount = useMemo(() => safeOffers.filter((o) => o?.status === "pending").length, [safeOffers]);
 
   return (
     <main className="min-h-screen bg-[#f8faf5] pb-24">

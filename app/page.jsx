@@ -1,13 +1,15 @@
+import dynamic from "next/dynamic";
 import Navbar from "@/components/marketplace/Navbar";
 import Hero from "@/components/marketplace/Hero";
 import TrustBar from "@/components/marketplace/TrustBar";
-import MarketPrices from "@/components/marketplace/MarketPrices";
-import HowItWorks from "@/components/marketplace/HowItWorks";
-import FeaturedProduce from "@/components/marketplace/FeaturedProduce";
-import BuyerCTA from "@/components/marketplace/BuyerCTA";
-import FarmerCTA from "@/components/marketplace/FarmerCTA";
-import WhyKrishiSetu from "@/components/marketplace/WhyKrishiSetu";
-import Footer from "@/components/marketplace/Footer";
+
+const MarketPrices = dynamic(() => import("@/components/marketplace/MarketPrices"), { loading: () => <div /> });
+const HowItWorks = dynamic(() => import("@/components/marketplace/HowItWorks"), { loading: () => <div /> });
+const FeaturedProduce = dynamic(() => import("@/components/marketplace/FeaturedProduce"), { loading: () => <div /> });
+const BuyerCTA = dynamic(() => import("@/components/marketplace/BuyerCTA"), { loading: () => <div /> });
+const FarmerCTA = dynamic(() => import("@/components/marketplace/FarmerCTA"), { loading: () => <div /> });
+const WhyKrishiSetu = dynamic(() => import("@/components/marketplace/WhyKrishiSetu"), { loading: () => <div /> });
+const Footer = dynamic(() => import("@/components/marketplace/Footer"), { ssr: false });
 
 export default function HomePage() {
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -134,13 +134,13 @@ export default function FarmerDashboard() {
     loadData();
   }, [router]);
 
-  async function handleLogout() {
+  const handleLogout = useCallback(async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.replace("/");
-  }
+  }, [router]);
 
-  async function handleCreateListing(formData) {
+  const handleCreateListing = useCallback(async (formData) => {
     try {
       const supabase = createClient();
       const { data: userData } = await supabase.auth.getUser();
@@ -175,15 +175,19 @@ export default function FarmerDashboard() {
     } catch (err) {
       console.error(err);
     }
-  }
+  }, [profile.district, profile.state]);
 
-  const safeListings = Array.isArray(listings) ? listings : [];
-  const safeOffers = Array.isArray(offers) ? offers : [];
-  const safeOrders = Array.isArray(orders) ? orders : [];
+  const safeListings = useMemo(() => Array.isArray(listings) ? listings : [], [listings]);
+  const safeOffers = useMemo(() => Array.isArray(offers) ? offers : [], [offers]);
+  const safeOrders = useMemo(() => Array.isArray(orders) ? orders : [], [orders]);
 
-  const activeProduceCount = safeListings.filter((l) => l && l.status !== "paused").length;
-  const pendingOffersCount = safeOffers.filter((o) => o && o.status === "pending").length;
-  const activeOrdersCount = safeOrders.filter((o) => o && o.status !== "cancelled").length;
+  const activeProduceCount = useMemo(() => safeListings.filter((l) => l && l.status !== "paused").length, [safeListings]);
+  const pendingOffersCount = useMemo(() => safeOffers.filter((o) => o && o.status === "pending").length, [safeOffers]);
+  const activeOrdersCount = useMemo(() => safeOrders.filter((o) => o && o.status !== "cancelled").length, [safeOrders]);
+
+  const handleShowCreateModal = useCallback(() => setShowCreateModal(true), []);
+  const handleHideCreateModal = useCallback(() => setShowCreateModal(false), []);
+  const handleViewMarketPrices = useCallback(() => router.push("/farmer/market-prices"), [router]);
 
   return (
     <main className="min-h-screen bg-[#f8faf5] pb-24">
@@ -191,7 +195,7 @@ export default function FarmerDashboard() {
       <FarmerHeader
         name={profile?.full_name || "Ramesh Patil"}
         onLogout={handleLogout}
-        onSellProduce={() => setShowCreateModal(true)}
+        onSellProduce={handleShowCreateModal}
         notificationCount={pendingOffersCount}
         activeListingsCount={safeListings.length}
       />
@@ -213,8 +217,8 @@ export default function FarmerDashboard() {
           location={`${profile?.district || "Nashik"}, ${profile?.state || "Maharashtra"}`}
           kisanId={profile?.kisan_id || "MH-NSK-88410"}
           pmKisanVerified={profile?.pm_kisan_verified !== false}
-          onSellProduce={() => setShowCreateModal(true)}
-          onViewMarketPrices={() => router.push("/farmer/market-prices")}
+          onSellProduce={handleShowCreateModal}
+          onViewMarketPrices={handleViewMarketPrices}
         />
 
         {/* 4 Metric Stat Cards */}
@@ -421,14 +425,14 @@ export default function FarmerDashboard() {
 
       {/* Floating Bottom Quick Action Dock */}
       <FarmerDock
-        onSellProduce={() => setShowCreateModal(true)}
+        onSellProduce={handleShowCreateModal}
         pendingOffersCount={pendingOffersCount}
       />
 
       {/* Sell Produce Modal */}
       <SellProduceModal
         isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        onClose={handleHideCreateModal}
         onSubmit={handleCreateListing}
         defaultLocation={`${profile.district || "Nashik"}, ${profile.state || "Maharashtra"}`}
       />

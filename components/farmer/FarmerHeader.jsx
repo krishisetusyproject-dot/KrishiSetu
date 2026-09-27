@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -18,21 +18,21 @@ export default function FarmerHeader({
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
-  const navItems = [
+  const navItems = useMemo(() => [
     { label: "Dashboard", href: "/farmer" },
     { label: "Produce", href: "/farmer/produce" },
     { label: "Buyer Offers", href: "/farmer/offers", badge: notificationCount },
     { label: "Orders & Pickup", href: "/farmer/orders" },
     { label: "Live Mandi Rates", href: "/farmer/market-prices" },
     { label: "Logistics Hub", href: "/farmer/logistics" },
-  ];
+  ], [notificationCount]);
 
   function isActive(href) {
     if (href === "/farmer") return pathname === "/farmer";
     return pathname.startsWith(href);
   }
 
-  async function handleDefaultLogout() {
+  const handleDefaultLogout = useCallback(async () => {
     if (onLogout) {
       await onLogout();
       return;
@@ -40,15 +40,15 @@ export default function FarmerHeader({
     const supabase = createClient();
     await supabase.auth.signOut();
     router.replace("/");
-  }
+  }, [onLogout, router]);
 
-  function handleSellClick() {
+  const handleSellClick = useCallback(() => {
     if (onSellProduce) {
       onSellProduce();
     } else {
       router.push("/farmer/produce?action=new");
     }
-  }
+  }, [onSellProduce, router]);
 
   const initial = (name || "F").trim().charAt(0).toUpperCase();
 

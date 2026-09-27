@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -30,7 +30,7 @@ export default function BuyerHeader({
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
-  const navItems = [
+  const navItems = useMemo(() => [
     { label: "Dashboard", href: "/buyer", icon: LayoutDashboard },
     { label: "Browse Produce", href: "/buyer/browse", icon: Search },
     {
@@ -56,14 +56,14 @@ export default function BuyerHeader({
       badge: unreadNotificationsCount,
       badgeColor: "bg-amber-500",
     },
-  ];
+  ], [activeOrdersCount, savedProduceCount, unreadNotificationsCount]);
 
   function isActive(href) {
     if (href === "/buyer") return pathname === "/buyer";
     return pathname.startsWith(href);
   }
 
-  async function handleDefaultLogout() {
+  const handleDefaultLogout = useCallback(async () => {
     if (onLogout) {
       await onLogout();
       return;
@@ -71,7 +71,7 @@ export default function BuyerHeader({
     const supabase = createClient();
     await supabase.auth.signOut();
     router.replace("/");
-  }
+  }, [onLogout, router]);
 
   const initial = (name || "B").trim().charAt(0).toUpperCase();
 

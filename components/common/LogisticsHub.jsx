@@ -1,10 +1,22 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Image from "next/image";
 import { getPartnerPlatforms } from "@/lib/services/partners";
 import { createClient } from "@/lib/supabase/client";
 import { Search, ExternalLink, ShieldCheck, Truck, ShoppingCart, Landmark } from "lucide-react";
+
+const typeIcons = {
+  logistics: <Truck className="h-4 w-4 text-sky-600" />,
+  f2c_platform: <ShoppingCart className="h-4 w-4 text-emerald-600" />,
+  government: <Landmark className="h-4 w-4 text-amber-600" />,
+};
+
+const typeLabels = {
+  logistics: "Transport & Logistics",
+  f2c_platform: "F2C Marketplaces",
+  government: "Government Initiatives",
+};
 
 export default function LogisticsHub({ userRole = "farmer" }) {
   const [partners, setPartners] = useState([]);
@@ -31,17 +43,7 @@ export default function LogisticsHub({ userRole = "farmer" }) {
     });
   }, [partners, search, filterType]);
 
-  const typeIcons = {
-    logistics: <Truck className="h-4 w-4 text-sky-600" />,
-    f2c_platform: <ShoppingCart className="h-4 w-4 text-emerald-600" />,
-    government: <Landmark className="h-4 w-4 text-amber-600" />,
-  };
 
-  const typeLabels = {
-    logistics: "Transport & Logistics",
-    f2c_platform: "F2C Marketplaces",
-    government: "Government Initiatives",
-  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">

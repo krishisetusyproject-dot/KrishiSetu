@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProfile } from "@/lib/services/profiles";
@@ -100,13 +100,13 @@ export default function FarmerOrdersPage() {
     loadOrders();
   }, [router]);
 
-  async function handleLogout() {
+  const handleLogout = useCallback(async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.replace("/");
-  }
+  }, [router]);
 
-  async function handleMarkDealCompleted(orderId) {
+  const handleMarkDealCompleted = useCallback(async (orderId) => {
     setUpdatingId(orderId);
     try {
       const order = orders.find((o) => o.id === orderId || o.realId === orderId);
@@ -132,14 +132,14 @@ export default function FarmerOrdersPage() {
     } finally {
       setUpdatingId(null);
     }
-  }
+  }, [orders]);
 
   const safeOrders = Array.isArray(orders) ? orders : [];
-  const filteredOrders = safeOrders.filter((o) => {
+  const filteredOrders = useMemo(() => safeOrders.filter((o) => {
     if (statusFilter === "scheduled") return o.status === "pickup_scheduled";
     if (statusFilter === "completed") return o.status === "completed";
     return true;
-  });
+  }), [safeOrders, statusFilter]);
 
   return (
     <main className="min-h-screen bg-[#f8faf5] pb-24">

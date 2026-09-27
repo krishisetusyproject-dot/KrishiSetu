@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProfile } from "@/lib/services/profiles";
@@ -167,11 +167,11 @@ export default function MarketPricesPage() {
     loadData();
   }, [router]);
 
-  async function handleLogout() {
+  const handleLogout = useCallback(async function () {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.replace("/");
-  }
+  }, [router]);
 
   const filteredPrices = useMemo(() => {
     return marketPrices.filter((p) => {

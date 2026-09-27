@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, Suspense } from "react";
+import { useEffect, useState, useMemo, Suspense, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -29,6 +29,8 @@ import {
   Search,
   Filter,
 } from "lucide-react";
+
+const EMPTY_FARMER = {};
 
 function OrdersContent() {
   const router = useRouter();
@@ -80,13 +82,13 @@ function OrdersContent() {
     loadData();
   }, []);
 
-  function showToast(msg) {
+  const showToast = useCallback((msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(""), 4000);
-  }
+  }, []);
 
   // Cancel / Withdraw an order
-  async function handleCancelOrder(orderId) {
+  const handleCancelOrder = useCallback(async (orderId) => {
     if (!window.confirm(`Are you sure you want to withdraw purchase offer #${orderId}? Full escrow deposit will be refunded.`)) {
       return;
     }
@@ -116,17 +118,17 @@ function OrdersContent() {
     } catch (e) {
       console.warn(e);
     }
-  }
+  }, [orders, showToast]);
 
   // Tabs Configuration
-  const tabs = [
+  const tabs = useMemo(() => [
     { key: "all", label: "All Orders", count: orders.length, icon: Package },
     { key: "pending", label: "Pending", count: orders.filter((o) => o.status === "pending").length, icon: Clock },
     { key: "confirmed", label: "Confirmed", count: orders.filter((o) => o.status === "confirmed").length, icon: CheckCircle2 },
     { key: "ready_for_pickup", label: "Ready for Pickup", count: orders.filter((o) => o.status === "ready_for_pickup").length, icon: Truck },
     { key: "completed", label: "Completed", count: orders.filter((o) => o.status === "completed").length, icon: Award },
     { key: "cancelled", label: "Cancelled", count: orders.filter((o) => o.status === "cancelled").length, icon: XCircle },
-  ];
+  ], [orders]);
 
   // Filtered Orders
   const filteredOrders = useMemo(() => {
@@ -147,9 +149,9 @@ function OrdersContent() {
     });
   }, [orders, activeTab, searchFilter]);
 
-  const activeCount = orders.filter((o) => ["pending", "confirmed", "ready_for_pickup"].includes(o.status)).length;
+  const activeCount = useMemo(() => orders.filter((o) => ["pending", "confirmed", "ready_for_pickup"].includes(o.status)).length, [orders]);
 
-  async function handleReviewSubmit({ rating, comment, orderId }) {
+  const handleReviewSubmit = useCallback(async ({ rating, comment, orderId }) => {
     try {
       const supabase = createClient();
       await submitReview(supabase, { orderId, rating, comment });
@@ -158,7 +160,7 @@ function OrdersContent() {
       console.warn("Failed to submit review:", e);
       showToast("Review saved locally. Will sync when online.");
     }
-  }
+  }, [showToast]);
 
   return (
     <div className="min-h-screen bg-[#f8faf6] pb-28 text-slate-900">
@@ -291,7 +293,7 @@ function OrdersContent() {
       <BuyerChatModal
         isOpen={Boolean(chatFarmer)}
         onClose={() => setChatFarmer(null)}
-        farmer={chatFarmer || {}}
+        farmer={chatFarmer || EMPTY_FARMER}
       />
 
       {/* Leave Review Modal */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, Suspense } from "react";
+import { useEffect, useState, useMemo, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -26,6 +26,8 @@ import {
   CheckCircle2,
   Package,
 } from "lucide-react";
+
+const EMPTY_FARMER = {};
 
 function BrowseContent() {
   const router = useRouter();
@@ -102,12 +104,12 @@ function BrowseContent() {
     loadData();
   }, []);
 
-  function showToast(msg) {
+  const showToast = useCallback((msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(""), 4000);
-  }
+  }, []);
 
-  function handleToggleSave(id) {
+  const handleToggleSave = useCallback((id) => {
     setSavedProduceIds((prev) => {
       let updated;
       if (prev.includes(id)) {
@@ -122,25 +124,30 @@ function BrowseContent() {
       } catch {}
       return updated;
     });
-  }
+  }, [showToast]);
 
-  function handleOrderPlaced(order) {
+  const handleOrderPlaced = useCallback((order) => {
     try {
       const existing = JSON.parse(localStorage.getItem("krishi_buyer_orders") || "[]");
       const updated = [order, ...existing];
       localStorage.setItem("krishi_buyer_orders", JSON.stringify(updated));
     } catch {}
     showToast(`Order request #${order.id} sent to ${order.farmer}!`);
-  }
+  }, [showToast]);
 
-  function resetFilters() {
+  const resetFilters = useCallback(() => {
     setSearch("");
     setSelectedCategory("All");
     setSelectedLocation("All");
     setMaxPrice(100);
     setMinQuantity(0);
     setSortBy("recent");
-  }
+  }, []);
+
+  const handleMakeOffer = useCallback((item) => setOrderModalListing(item), []);
+  const handleChat = useCallback((farmerInfo) => setChatModalFarmer(farmerInfo), []);
+  const closeOrderModal = useCallback(() => setOrderModalListing(null), []);
+  const closeChatModal = useCallback(() => setChatModalFarmer(null), []);
 
   // Derive unique categories & locations from produce
   const categories = useMemo(() => {
@@ -358,8 +365,8 @@ function BrowseContent() {
                 {...produce}
                 isSaved={savedProduceIds.includes(produce.id)}
                 onToggleSave={handleToggleSave}
-                onMakeOffer={(item) => setOrderModalListing(item)}
-                onChat={(farmerInfo) => setChatModalFarmer(farmerInfo)}
+                onMakeOffer={handleMakeOffer}
+                onChat={handleChat}
               />
             ))}
           </div>
@@ -387,7 +394,7 @@ function BrowseContent() {
       {/* Place Order / Offer Modal */}
       <BuyerOrderModal
         isOpen={Boolean(orderModalListing)}
-        onClose={() => setOrderModalListing(null)}
+        onClose={closeOrderModal}
         listing={orderModalListing}
         onSubmitOrder={handleOrderPlaced}
       />
@@ -395,8 +402,8 @@ function BrowseContent() {
       {/* Chat Farmer Modal */}
       <BuyerChatModal
         isOpen={Boolean(chatModalFarmer)}
-        onClose={() => setChatModalFarmer(null)}
-        farmer={chatModalFarmer || {}}
+        onClose={closeChatModal}
+        farmer={chatModalFarmer || EMPTY_FARMER}
       />
     </div>
   );

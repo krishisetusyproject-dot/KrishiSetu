@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -32,6 +32,9 @@ import {
   MapPin,
   Package,
 } from "lucide-react";
+
+const cropChips = ["All", "Tomato", "Onion", "Potato", "Wheat", "Chillies", "Mustard"];
+const EMPTY_FARMER = {};
 
 export default function BuyerDashboardPage() {
   const router = useRouter();
@@ -126,13 +129,13 @@ export default function BuyerDashboardPage() {
     loadData();
   }, [router]);
 
-  function showToast(msg) {
+  const showToast = useCallback((msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(""), 4500);
-  }
+  }, []);
 
   // Toggle Save Produce to Wishlist
-  function handleToggleSave(id) {
+  const handleToggleSave = useCallback((id) => {
     setSavedProduceIds((prev) => {
       let updated;
       if (prev.includes(id)) {
@@ -149,10 +152,10 @@ export default function BuyerDashboardPage() {
       }
       return updated;
     });
-  }
+  }, [showToast]);
 
   // Submit Offer / Order
-  async function handleSubmitOrder(newOrder) {
+  const handleSubmitOrder = useCallback(async (newOrder) => {
     const updated = [newOrder, ...orders];
     setOrders(updated);
     try {
@@ -183,31 +186,28 @@ export default function BuyerDashboardPage() {
     } catch (err) {
       console.warn("Supabase order insert skipped:", err);
     }
-  }
+  }, [orders, showToast]);
 
   // Handle Search Submission
-  function handleSearchSubmit(e) {
+  const handleSearchSubmit = useCallback((e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/buyer/browse?query=${encodeURIComponent(searchQuery.trim())}`);
     } else {
       router.push("/buyer/browse");
     }
-  }
+  }, [searchQuery, router]);
 
   // Order Counts
-  const pendingCount = orders.filter((o) => o.status === "pending").length;
-  const confirmedCount = orders.filter((o) => o.status === "confirmed").length;
-  const readyPickupCount = orders.filter((o) => o.status === "ready_for_pickup").length;
-  const completedCount = orders.filter((o) => o.status === "completed").length;
+  const pendingCount = useMemo(() => orders.filter((o) => o.status === "pending").length, [orders]);
+  const confirmedCount = useMemo(() => orders.filter((o) => o.status === "confirmed").length, [orders]);
+  const readyPickupCount = useMemo(() => orders.filter((o) => o.status === "ready_for_pickup").length, [orders]);
+  const completedCount = useMemo(() => orders.filter((o) => o.status === "completed").length, [orders]);
 
-  // Quick crop filters
-  const cropChips = ["All", "Tomato", "Onion", "Potato", "Wheat", "Chillies", "Mustard"];
-
-  const filteredProduce = produceList.filter((item) => {
+  const filteredProduce = useMemo(() => produceList.filter((item) => {
     if (selectedCropFilter === "All") return true;
     return item.title.toLowerCase().includes(selectedCropFilter.toLowerCase());
-  });
+  }), [produceList, selectedCropFilter]);
 
   return (
     <div className="min-h-screen bg-[#f8faf6] pb-28 text-slate-900">
@@ -454,7 +454,7 @@ export default function BuyerDashboardPage() {
       <BuyerChatModal
         isOpen={Boolean(chatModalFarmer)}
         onClose={() => setChatModalFarmer(null)}
-        farmer={chatModalFarmer || {}}
+        farmer={chatModalFarmer || EMPTY_FARMER}
       />
     </div>
   );
