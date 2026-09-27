@@ -15,14 +15,14 @@ export default function FeaturedProduce() {
             </h2>
           </div>
           <a
-            href="#"
+            href="/buyer/browse"
             className="inline-flex items-center justify-center rounded-full bg-emerald-950 px-6 py-3 text-sm font-semibold text-amber-100 shadow-sm shadow-emerald-950/15 hover:bg-emerald-900"
           >
             View All Produce
           </a>
         </div>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {produceList.map((product) => (
             <ProductCard key={product.name} product={product} />
           ))}

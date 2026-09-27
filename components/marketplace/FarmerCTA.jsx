@@ -12,7 +12,7 @@ export default function FarmerCTA() {
               List your produce, reach verified buyers, and see transparent market reference prices before making a deal.
             </p>
             <a
-              href="/register"
+              href="/login"
               className="mt-8 inline-flex rounded-full bg-amber-100 px-6 py-3 text-sm font-semibold text-emerald-950 shadow-sm shadow-emerald-950/15 hover:bg-slate-100"
             >
               List Your Produce
