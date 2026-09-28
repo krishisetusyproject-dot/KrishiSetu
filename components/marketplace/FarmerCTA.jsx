@@ -6,10 +6,10 @@ export default function FarmerCTA() {
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-100/80">Have Produce to Sell?</p>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-amber-100 sm:text-4xl">
-              List your produce, reach verified buyers, and sell with confidence.
+              Cut out the middlemen. Get the price your hard work deserves.
             </h2>
             <p className="mt-5 max-w-xl text-base leading-7 text-amber-100/80">
-              List your produce, reach verified buyers, and see transparent market reference prices before making a deal.
+              List your produce, reach verified buyers directly, and see transparent market reference prices. Enjoy higher margins, zero hidden commissions, and fast payments directly to your account.
             </p>
             <a
               href="/login"

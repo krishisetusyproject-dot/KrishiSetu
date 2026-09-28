@@ -23,6 +23,15 @@ export default function MarketPrices() {
           ))}
         </div>
 
+        <div className="mt-10 flex justify-center">
+          <a
+            href="/prices"
+            className="inline-flex items-center justify-center rounded-full bg-emerald-100 px-8 py-3 text-sm font-bold text-emerald-900 shadow-sm hover:bg-emerald-200 transition-colors border border-emerald-200"
+          >
+            View All Live Market Prices
+          </a>
+        </div>
+
         <div className="mt-8 rounded-3xl border border-emerald-950/10 bg-emerald-950/5 px-5 py-4 text-center text-sm text-emerald-950/90 sm:px-8">
           Source: Government market data. APMC prices are shown as a reference price only.
         </div>
