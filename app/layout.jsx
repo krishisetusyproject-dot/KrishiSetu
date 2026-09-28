@@ -1,5 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
+import GoogleTranslate from "@/components/GoogleTranslate";
+import FloatingLanguageWidget from "@/components/FloatingLanguageWidget";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,7 +26,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         {/* Preconnect to Supabase to reduce DNS+TLS overhead on first API call */}
         <link
@@ -35,7 +37,12 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
         />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className} suppressHydrationWarning>
+        <GoogleTranslate />
+        {children}
+        <FloatingLanguageWidget />
+      </body>
     </html>
   );
 }
+

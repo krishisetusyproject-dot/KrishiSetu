@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import BrandLogo from "@/components/BrandLogo";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
   Menu,
   X,
@@ -118,6 +119,8 @@ export default function BuyerHeader({
 
         {/* Right Actions */}
         <div className="hidden items-center gap-3 xl:flex shrink-0">
+          <LanguageSwitcher />
+
           <Link
             href="/buyer/browse"
             className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950 px-4 py-2 text-xs sm:text-sm font-bold text-amber-100 shadow-sm shadow-emerald-950/10 hover:bg-emerald-900 active:scale-95 transition-all whitespace-nowrap shrink-0"
@@ -154,15 +157,18 @@ export default function BuyerHeader({
           </button>
         </div>
 
-        {/* Mobile menu button */}
-        <button
-          type="button"
-          onClick={() => setOpen(!open)}
-          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 xl:hidden"
-          aria-label="Toggle navigation menu"
-        >
-          {open ? <X size={18} /> : <Menu size={18} />}
-        </button>
+        {/* Mobile controls */}
+        <div className="flex items-center gap-2 xl:hidden">
+          <LanguageSwitcher />
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700"
+            aria-label="Toggle navigation menu"
+          >
+            {open ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Drawer */}

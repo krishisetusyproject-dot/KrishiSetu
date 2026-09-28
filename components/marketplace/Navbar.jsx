@@ -4,10 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, ArrowRight } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const navItems = [
   { label: "Home", href: "/#home" },
-  { label: "Explore Produce", href: "/#produce" },
+  { label: "Explore", href: "/explore" },
   { label: "How It Works", href: "/#how-it-works" },
   { label: "Market Prices", href: "/#market-prices" },
   { label: "About", href: "/#why-krishi" },
@@ -41,6 +42,8 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <LanguageSwitcher />
+
           <Link
             href="/farmer"
             className="rounded-full border border-emerald-900/10 bg-white px-4 py-2 text-sm font-semibold text-emerald-950 shadow-xs hover:bg-slate-50 transition"
@@ -61,14 +64,17 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setOpen(!open)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 lg:hidden"
-          aria-label="Toggle navigation menu"
-        >
-          {open ? <X size={18} /> : <Menu size={18} />}
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <LanguageSwitcher />
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700"
+            aria-label="Toggle navigation menu"
+          >
+            {open ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
       </div>
 
       {open && (
