@@ -64,17 +64,28 @@ a:focus-visible {
    Google Translate Clean UI Overrides
    Prevents layout shift, hides default iframe banner & tooltips
    ======================================================== */
+html {
+  top: 0px !important;
+}
+
 body {
   top: 0px !important;
   position: static !important;
 }
 
+/* Hide top translation iframe banners and injected containers */
 .goog-te-banner-frame,
 .goog-te-banner-frame.skiptranslate,
-iframe.goog-te-banner-frame {
+iframe.goog-te-banner-frame,
+iframe.skiptranslate,
+.skiptranslate iframe,
+body > .skiptranslate:first-child {
   display: none !important;
   visibility: hidden !important;
   height: 0 !important;
+  width: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 #goog-gt-tt,
@@ -98,4 +109,5 @@ iframe.goog-te-banner-frame {
   opacity: 0;
   pointer-events: none;
 }
+
 
