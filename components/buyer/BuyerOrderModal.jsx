@@ -56,6 +56,7 @@ export default function BuyerOrderModal({
 
     setSubmitting(true);
     try {
+      
       const orderPayload = {
         id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
         crop: listing.title || listing.crop_name,
@@ -69,11 +70,12 @@ export default function BuyerOrderModal({
         order_date: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
         status: "pending",
         pickup_location: listing.location ? `${listing.location} Farmgate Hub` : "Farmgate Hub, Nashik",
-        pickup_date: `${pickupDate || "Tomorrow"} (08:00 AM - 12:00 PM)`,
+        pickup_date: pickupDate,
         notes: notes.trim() || "Buyer offer submitted via KrishiSetu. Awaiting farmer confirmation.",
         payment_status: "Escrow Locked",
         listing_id: listing.id,
       };
+       console.log("ORDER PAYLOAD", orderPayload);
 
       if (onSubmitOrder) {
         await onSubmitOrder(orderPayload);
