@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BrandLogo from "@/components/BrandLogo";
 import { createClient } from "@/lib/supabase/client";
-import { getUserProfile } from "@/lib/services/profiles";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,7 +21,11 @@ export default function LoginPage() {
         const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user;
         if (user) {
-          const profile = await getUserProfile(supabase, user.id);
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("profile_id", user.id)
+            .maybeSingle();
           const role = profile?.role || user.user_metadata?.role || "user";
           setCurrentSession({
             email: user.email,
@@ -79,7 +82,15 @@ export default function LoginPage() {
     }
 
     try {
-      const profile = await getUserProfile(supabase, data.user.id);
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("profile_id", data.user.id)
+        .maybeSingle();
+      if (profileError) {
+        console.warn("Could not read profile role after sign-in:", profileError);
+      }
+
       let role = profile?.role;
 
       if (!role) {
@@ -89,22 +100,24 @@ export default function LoginPage() {
           : null;
 
         if (!role) {
-          throw new Error("Your account role is missing or invalid. Please contact support.");
+          throw new Error(profileError?.message || "Your account role is missing or invalid. Please contact support.");
         }
-        
-        const { error: profileError } = await supabase.from("profiles").upsert({
-          profile_id: data.user.id,
-          full_name: metadata.full_name || "KrishiSetu user",
-          email: data.user.email,
-          phone: metadata.phone || null,
-          role,
-          village: metadata.village || null,
-          city: metadata.city || null,
-          district: metadata.district || null,
-          state: metadata.state || null,
-          pincode: metadata.pincode || null,
-        });
-        if (profileError) throw profileError;
+
+        if (!profileError) {
+          const { error: upsertError } = await supabase.from("profiles").upsert({
+            profile_id: data.user.id,
+            full_name: metadata.full_name || "KrishiSetu user",
+            email: data.user.email,
+            phone: metadata.phone || null,
+            role,
+            village: metadata.village || null,
+            city: metadata.city || null,
+            district: metadata.district || null,
+            state: metadata.state || null,
+            pincode: metadata.pincode || null,
+          });
+          if (upsertError) console.warn("Could not create missing profile row:", upsertError);
+        }
       }
 
       router.replace(role === "admin" ? "/admin" : role === "farmer" ? "/farmer" : "/buyer");
