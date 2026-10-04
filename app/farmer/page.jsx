@@ -16,7 +16,6 @@ import {
 } from "@/lib/services/farmer-defaults";
 
 import FarmerHeader from "@/components/farmer/FarmerHeader";
-import FarmerDock from "@/components/farmer/FarmerDock";
 import WelcomeHeader from "@/components/farmer/WelcomeHeader";
 import DashboardStats from "@/components/farmer/DashboardStats";
 import ProduceCard from "@/components/farmer/ProduceCard";
@@ -196,7 +195,6 @@ export default function FarmerDashboard() {
       <FarmerHeader
         name={profile?.full_name || "Ramesh Patil"}
         onLogout={handleLogout}
-        onSellProduce={handleShowCreateModal}
         notificationCount={pendingOffersCount}
         activeListingsCount={safeListings.length}
       />
@@ -423,12 +421,6 @@ export default function FarmerDashboard() {
           </div>
         </section>
       </div>
-
-      {/* Floating Bottom Quick Action Dock */}
-      <FarmerDock
-        onSellProduce={handleShowCreateModal}
-        pendingOffersCount={pendingOffersCount}
-      />
 
       {/* Sell Produce Modal */}
       <SellProduceModal

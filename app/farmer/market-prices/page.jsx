@@ -8,8 +8,6 @@ import { getMarketPrices, getStates, getCommodities } from "@/lib/services/marke
 import { DEFAULT_FARMER_PROFILE } from "@/lib/services/farmer-defaults";
 
 import FarmerHeader from "@/components/farmer/FarmerHeader";
-import FarmerDock from "@/components/farmer/FarmerDock";
-import SellProduceModal from "@/components/farmer/SellProduceModal";
 import EmptyState from "@/components/farmer/EmptyState";
 import {
   Search,
@@ -126,7 +124,6 @@ export default function MarketPricesPage() {
   const [searchCrop, setSearchCrop] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [states, setStates] = useState(["Maharashtra", "Madhya Pradesh", "Gujarat", "Punjab"]);
-  const [showSellModal, setShowSellModal] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -190,7 +187,6 @@ export default function MarketPricesPage() {
       <FarmerHeader
         name={profile?.full_name || "Ramesh Patil"}
         onLogout={handleLogout}
-        onSellProduce={() => setShowSellModal(true)}
         notificationCount={2}
       />
 
@@ -349,16 +345,6 @@ export default function MarketPricesPage() {
         )}
       </div>
 
-      <FarmerDock
-        onSellProduce={() => setShowSellModal(true)}
-        pendingOffersCount={2}
-      />
-
-      <SellProduceModal
-        isOpen={showSellModal}
-        onClose={() => setShowSellModal(false)}
-        onSubmit={async () => router.push("/farmer/produce")}
-      />
     </main>
   );
 }

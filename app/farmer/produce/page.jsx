@@ -13,7 +13,6 @@ import {
 import { DEFAULT_PRODUCE_LISTINGS, DEFAULT_FARMER_PROFILE } from "@/lib/services/farmer-defaults";
 
 import FarmerHeader from "@/components/farmer/FarmerHeader";
-import FarmerDock from "@/components/farmer/FarmerDock";
 import ProduceCard from "@/components/farmer/ProduceCard";
 import SellProduceModal from "@/components/farmer/SellProduceModal";
 import EmptyState from "@/components/farmer/EmptyState";
@@ -176,7 +175,6 @@ function ProduceInventoryContent() {
       <FarmerHeader
         name={profile?.full_name || "Ramesh Patil"}
         onLogout={handleLogout}
-        onSellProduce={() => setShowCreateModal(true)}
         activeListingsCount={safeListings.length}
         notificationCount={2}
       />
@@ -361,12 +359,6 @@ function ProduceInventoryContent() {
           />
         )}
       </div>
-
-      {/* Floating Bottom Action Dock */}
-      <FarmerDock
-        onSellProduce={() => setShowCreateModal(true)}
-        pendingOffersCount={2}
-      />
 
       {/* Sell Produce Modal */}
       <SellProduceModal

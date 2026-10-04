@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProfile } from "@/lib/services/profiles";
 import FarmerHeader from "@/components/farmer/FarmerHeader";
-import FarmerDock from "@/components/farmer/FarmerDock";
-import SellProduceModal from "@/components/farmer/SellProduceModal";
 import { ArrowLeft, User } from "lucide-react";
 
 export default function ProfilePage() {
@@ -17,7 +15,6 @@ export default function ProfilePage() {
   const [form, setForm] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [showSellModal, setShowSellModal] = useState(false);
 
   useEffect(() => {
     async function loadProfile() {
@@ -115,7 +112,6 @@ export default function ProfilePage() {
         <FarmerHeader
           name={profile?.full_name || "Farmer"}
           onLogout={handleLogout}
-          onSellProduce={() => setShowSellModal(true)}
           notificationCount={2}
         />
         <div className="flex items-center justify-center py-20">
@@ -130,7 +126,6 @@ export default function ProfilePage() {
       <FarmerHeader
         name={profile?.full_name || "Farmer"}
         onLogout={handleLogout}
-        onSellProduce={() => setShowSellModal(true)}
         notificationCount={2}
       />
 
@@ -314,16 +309,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <FarmerDock
-        onSellProduce={() => setShowSellModal(true)}
-        pendingOffersCount={2}
-      />
-
-      <SellProduceModal
-        isOpen={showSellModal}
-        onClose={() => setShowSellModal(false)}
-        onSubmit={async () => router.push("/farmer/produce")}
-      />
     </main>
   );
 }

@@ -8,9 +8,7 @@ import { getFarmerOrders, updateOrderStatus } from "@/lib/services/orders";
 import { DEFAULT_ORDERS, DEFAULT_FARMER_PROFILE } from "@/lib/services/farmer-defaults";
 
 import FarmerHeader from "@/components/farmer/FarmerHeader";
-import FarmerDock from "@/components/farmer/FarmerDock";
 import OrderCard from "@/components/farmer/OrderCard";
-import SellProduceModal from "@/components/farmer/SellProduceModal";
 import EmptyState from "@/components/farmer/EmptyState";
 import { ShieldCheck, CheckCircle2, Filter } from "lucide-react";
 
@@ -22,7 +20,6 @@ export default function FarmerOrdersPage() {
   const [updatingId, setUpdatingId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [successMessage, setSuccessMessage] = useState("");
-  const [showSellModal, setShowSellModal] = useState(false);
 
   useEffect(() => {
     async function loadOrders() {
@@ -146,7 +143,6 @@ export default function FarmerOrdersPage() {
       <FarmerHeader
         name={profile?.full_name || "Ramesh Patil"}
         onLogout={handleLogout}
-        onSellProduce={() => setShowSellModal(true)}
         notificationCount={2}
       />
 
@@ -252,18 +248,6 @@ export default function FarmerOrdersPage() {
       </div>
 
       {/* Floating Bottom Dock */}
-      <FarmerDock
-        onSellProduce={() => setShowSellModal(true)}
-        pendingOffersCount={2}
-      />
-
-      <SellProduceModal
-        isOpen={showSellModal}
-        onClose={() => setShowSellModal(false)}
-        onSubmit={async () => {
-          router.push("/farmer/produce");
-        }}
-      />
     </main>
   );
 }

@@ -8,8 +8,6 @@ import { getFarmerOffers, acceptOffer, rejectOffer } from "@/lib/services/offers
 import { DEFAULT_OFFERS, DEFAULT_FARMER_PROFILE } from "@/lib/services/farmer-defaults";
 
 import FarmerHeader from "@/components/farmer/FarmerHeader";
-import FarmerDock from "@/components/farmer/FarmerDock";
-import SellProduceModal from "@/components/farmer/SellProduceModal";
 import EmptyState from "@/components/farmer/EmptyState";
 import {
   Building2,
@@ -29,7 +27,6 @@ export default function BuyerOffersPage() {
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState(null);
   const [successToast, setSuccessToast] = useState("");
-  const [showSellModal, setShowSellModal] = useState(false);
 
   useEffect(() => {
     async function loadOffers() {
@@ -143,7 +140,6 @@ export default function BuyerOffersPage() {
       <FarmerHeader
         name={profile?.full_name || "Ramesh Patil"}
         onLogout={handleLogout}
-        onSellProduce={() => setShowSellModal(true)}
         notificationCount={pendingCount}
       />
 
@@ -327,16 +323,6 @@ export default function BuyerOffersPage() {
         )}
       </div>
 
-      <FarmerDock
-        onSellProduce={() => setShowSellModal(true)}
-        pendingOffersCount={pendingCount}
-      />
-
-      <SellProduceModal
-        isOpen={showSellModal}
-        onClose={() => setShowSellModal(false)}
-        onSubmit={async () => router.push("/farmer/produce")}
-      />
     </main>
   );
 }

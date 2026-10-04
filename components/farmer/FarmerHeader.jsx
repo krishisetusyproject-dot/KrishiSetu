@@ -6,12 +6,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import BrandLogo from "@/components/BrandLogo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { Menu, X, Plus, LogOut, User, ShoppingBag } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 
 export default function FarmerHeader({
   name = "Ramesh Patil",
   onLogout,
-  onSellProduce,
   notificationCount = 0,
   activeListingsCount,
 }) {
@@ -43,21 +42,13 @@ export default function FarmerHeader({
     router.replace("/");
   }, [onLogout, router]);
 
-  const handleSellClick = useCallback(() => {
-    if (onSellProduce) {
-      onSellProduce();
-    } else {
-      router.push("/farmer/produce?action=new");
-    }
-  }, [onSellProduce, router]);
-
   const initial = (name || "F").trim().charAt(0).toUpperCase();
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-slate-50/95 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-screen-2xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center px-4 py-3.5 sm:px-6 lg:px-8">
         {/* Brand */}
-        <Link href="/farmer" className="flex items-center gap-3 group shrink-0">
+        <Link href="/farmer" className="col-start-1 row-start-1 flex items-center gap-3 group shrink-0">
           <BrandLogo
             className="h-11 w-auto transition-transform group-hover:scale-[1.02]"
             nameClassName="text-lg font-extrabold text-emerald-950 whitespace-nowrap"
@@ -67,7 +58,7 @@ export default function FarmerHeader({
         </Link>
 
         {/* Center Nav Links */}
-        <nav className="hidden shrink-0 items-center gap-3 2xl:flex 2xl:gap-5">
+        <nav className="col-start-2 row-start-1 hidden shrink-0 items-center gap-3 justify-self-center 2xl:flex 2xl:gap-5">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
@@ -92,16 +83,8 @@ export default function FarmerHeader({
         </nav>
 
         {/* Right Actions */}
-        <div className="hidden shrink-0 items-center gap-3 2xl:flex">
+        <div className="col-start-3 row-start-1 hidden shrink-0 items-center gap-3 justify-self-end 2xl:flex">
           <LanguageSwitcher />
-
-          <button
-            onClick={handleSellClick}
-            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950 px-4 py-2 text-xs sm:text-sm font-bold text-amber-100 shadow-sm shadow-emerald-950/10 hover:bg-emerald-900 active:scale-95 transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Sell Produce</span>
-          </button>
 
           {/* User Profile Pill */}
           <Link
@@ -132,7 +115,7 @@ export default function FarmerHeader({
         </div>
 
         {/* Mobile controls */}
-        <div className="flex items-center gap-2 2xl:hidden">
+        <div className="col-start-3 row-start-1 flex items-center gap-2 justify-self-end 2xl:hidden">
           <LanguageSwitcher />
           <button
             type="button"
@@ -174,17 +157,6 @@ export default function FarmerHeader({
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-200 space-y-2.5">
-            <button
-              onClick={() => {
-                setOpen(false);
-                handleSellClick();
-              }}
-              className="w-full flex items-center justify-center gap-1.5 rounded-full bg-emerald-950 px-4 py-2.5 text-sm font-bold text-amber-100 shadow-sm"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Sell Produce</span>
-            </button>
-
             <Link
               href="/farmer/profile"
               onClick={() => setOpen(false)}
