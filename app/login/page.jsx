@@ -19,10 +19,13 @@ export default function LoginPage() {
     async function checkExistingSession() {
       try {
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
         if (user) {
-          const profile = await getUserProfile(supabase, user.id);
-          const role = profile?.role || user.user_metadata?.role || "user";
+          const metadataRole = user.user_metadata?.role;
+          const role = ["admin", "farmer", "buyer"].includes(metadataRole)
+            ? metadataRole
+            : (await getUserProfile(supabase, user.id))?.role || "user";
           setCurrentSession({
             email: user.email,
             role,
@@ -74,6 +77,12 @@ export default function LoginPage() {
           : "Incorrect email or password. Please check your details and try again."
       );
       setLoading(false);
+      return;
+    }
+
+    const metadataRole = data.user.user_metadata?.role;
+    if (metadataRole === "farmer" || metadataRole === "buyer") {
+      router.replace(metadataRole === "farmer" ? "/farmer" : "/buyer");
       return;
     }
 
