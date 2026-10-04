@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import Image from "next/image";
+import { useState, useEffect, useMemo } from "react";
 import { getPartnerPlatforms } from "@/lib/services/partners";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -9,37 +8,27 @@ import {
   ExternalLink,
   ShieldCheck,
   Truck,
-  ShoppingCart,
-  ShoppingBasket,
   Landmark,
-  Leaf,
 } from "lucide-react";
 
 const typeIcons = {
   logistics: <Truck className="h-4 w-4 text-sky-600" />,
-  f2c_platform: <ShoppingCart className="h-4 w-4 text-emerald-600" />,
-  government: <Landmark className="h-4 w-4 text-amber-600" />,
 };
 
 const typeLabels = {
   logistics: "Transport & Logistics",
-  f2c_platform: "F2C Marketplaces",
-  government: "Government Initiatives",
 };
 
 const partnerIcons = {
   "kisan rath": { Icon: Truck, color: "text-sky-700", background: "bg-sky-50" },
   "kisansabha": { Icon: Landmark, color: "text-emerald-700", background: "bg-emerald-50" },
   "porter / fast logistics": { Icon: Truck, color: "text-orange-700", background: "bg-orange-50" },
-  "otipy": { Icon: ShoppingBasket, color: "text-rose-700", background: "bg-rose-50" },
-  "ninjacart": { Icon: Leaf, color: "text-lime-700", background: "bg-lime-50" },
 };
 
 export default function LogisticsHub({ userRole = "farmer" }) {
   const [partners, setPartners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState("All");
 
   useEffect(() => {
     async function fetchPartners() {
@@ -52,13 +41,11 @@ export default function LogisticsHub({ userRole = "farmer" }) {
   }, []);
 
   const filteredPartners = useMemo(() => {
-    return partners.filter((p) => {
-      const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
-                            p.description.toLowerCase().includes(search.toLowerCase());
-      const matchesType = filterType === "All" || p.type === filterType;
-      return matchesSearch && matchesType;
-    });
-  }, [partners, search, filterType]);
+    return partners.filter((partner) =>
+      partner.name.toLowerCase().includes(search.toLowerCase()) ||
+      partner.description.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [partners, search]);
 
 
 
@@ -68,11 +55,11 @@ export default function LogisticsHub({ userRole = "farmer" }) {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
-            Partner Platforms & Logistics
+            Transport & Logistics Partners
           </h1>
           <p className="text-slate-500 mt-2 text-sm max-w-2xl">
             {userRole === "farmer" 
-              ? "Find verified transport references like Kisan Rath to move your harvest, or explore direct-to-consumer partner apps."
+              ? "Find transport services to help move your harvest from the farm to buyers."
               : "Access trusted transport and freight providers to assist with farmgate pickups and large-scale procurement moving."}
           </p>
         </div>
@@ -83,8 +70,8 @@ export default function LogisticsHub({ userRole = "farmer" }) {
       </div>
 
       {/* Controls */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
+      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+        <div className="relative">
           <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
           <input
             type="text"
@@ -94,15 +81,6 @@ export default function LogisticsHub({ userRole = "farmer" }) {
             className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-600 focus:bg-white transition"
           />
         </div>
-        <select
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-          className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 focus:outline-none focus:border-emerald-600"
-        >
-          <option value="All">All Categories</option>
-          <option value="logistics">Logistics & Transport</option>
-          <option value="f2c_platform">F2C Marketplaces</option>
-        </select>
       </div>
 
       {/* Grid */}
@@ -116,7 +94,7 @@ export default function LogisticsHub({ userRole = "farmer" }) {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPartners.map((partner) => {
             const visual = partnerIcons[partner.name.toLowerCase()] || {
-              Icon: partner.type === "logistics" ? Truck : ShoppingCart,
+              Icon: Truck,
               color: "text-emerald-700",
               background: "bg-emerald-50",
             };
