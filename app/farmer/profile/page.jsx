@@ -70,8 +70,11 @@ export default function ProfilePage() {
       const supabase = createClient();
       const { data: userData } = await supabase.auth.getUser();
 
-      const profileKey = profile.profile_id ? "profile_id" : "id";
-      const { error } = await supabase
+      if (!userData?.user) {
+        throw new Error("Your session has expired. Please sign in again.");
+      }
+
+      const { data: updatedProfile, error } = await supabase
         .from("profiles")
         .update({
           full_name: form.full_name,
@@ -83,9 +86,14 @@ export default function ProfilePage() {
           state: form.state,
           pincode: form.pincode,
         })
-        .eq(profileKey, userData.user.id);
+        .eq("profile_id", userData.user.id)
+        .select("profile_id")
+        .maybeSingle();
 
       if (error) throw error;
+      if (!updatedProfile) {
+        throw new Error("No profile row was updated. Check the profile update policy in Supabase.");
+      }
 
       setSuccessMessage("Your profile has been updated successfully!");
       setTimeout(() => setSuccessMessage(""), 4000);
@@ -94,7 +102,7 @@ export default function ProfilePage() {
       setProfile((current) => ({ ...current, ...form }));
     } catch (err) {
       console.error("Error saving profile:", err);
-      setErrorMessage("Failed to save your profile. Please try again.");
+      setErrorMessage(`Failed to save your profile: ${err?.message || "Please try again."}`);
     } finally {
       setSaving(false);
     }
