@@ -19,7 +19,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-slate-50/95 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-3">
           <BrandLogo
             className="h-11 w-auto"
@@ -29,30 +29,30 @@ export default function Navbar() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-8 lg:flex">
+        <nav className="hidden shrink-0 items-center gap-6 2xl:flex 2xl:gap-8">
           {navItems.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className="text-sm font-medium text-slate-700 transition hover:text-emerald-950"
+              className="whitespace-nowrap text-sm font-medium text-slate-700 transition hover:text-emerald-950"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden shrink-0 items-center gap-3 2xl:flex">
           <LanguageSwitcher />
 
           <Link
             href="/farmer"
-            className="rounded-full border border-emerald-900/10 bg-white px-4 py-2 text-sm font-semibold text-emerald-950 shadow-xs hover:bg-slate-50 transition"
+            className="whitespace-nowrap rounded-full border border-emerald-900/10 bg-white px-4 py-2 text-sm font-semibold text-emerald-950 shadow-xs hover:bg-slate-50 transition"
           >
             Farmer Portal
           </Link>
           <Link
             href="/buyer"
-            className="rounded-full bg-emerald-950 px-4 py-2 text-sm font-semibold text-amber-100 shadow-xs hover:bg-emerald-900 transition"
+            className="whitespace-nowrap rounded-full bg-emerald-950 px-4 py-2 text-sm font-semibold text-amber-100 shadow-xs hover:bg-emerald-900 transition"
           >
             Buyer Portal
           </Link>
@@ -64,7 +64,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-2 2xl:hidden">
           <LanguageSwitcher />
           <button
             type="button"
@@ -78,7 +78,7 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div className="lg:hidden border-t border-slate-200/80 bg-slate-50/95 px-4 pb-5 shadow-lg">
+        <div className="2xl:hidden border-t border-slate-200/80 bg-slate-50/95 px-4 pb-5 shadow-lg">
           <div className="space-y-2 pt-4">
             {navItems.map((item) => (
               <Link

@@ -77,7 +77,7 @@ export default function BuyerHeader({
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-slate-50/95 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
         {/* Brand */}
         <Link href="/buyer" className="flex items-center gap-3 group shrink-0">
           <BrandLogo
@@ -89,14 +89,14 @@ export default function BuyerHeader({
         </Link>
 
         {/* Center Nav Links */}
-        <nav className="hidden items-center gap-3 xl:gap-5 xl:flex">
+        <nav className="hidden shrink-0 items-center gap-3 2xl:flex 2xl:gap-5">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative text-xs sm:text-sm transition flex items-center gap-1.5 pb-1 shrink-0 ${
+                className={`relative shrink-0 whitespace-nowrap text-xs sm:text-sm transition flex items-center gap-1.5 pb-1 ${
                   active
                     ? "font-bold text-emerald-950 border-b-2 border-emerald-950"
                     : "font-medium text-slate-600 hover:text-emerald-950"
@@ -118,7 +118,7 @@ export default function BuyerHeader({
         </nav>
 
         {/* Right Actions */}
-        <div className="hidden items-center gap-3 xl:flex shrink-0">
+        <div className="hidden shrink-0 items-center gap-3 2xl:flex">
           <LanguageSwitcher />
 
           <Link
@@ -158,7 +158,7 @@ export default function BuyerHeader({
         </div>
 
         {/* Mobile controls */}
-        <div className="flex items-center gap-2 xl:hidden">
+        <div className="flex items-center gap-2 2xl:hidden">
           <LanguageSwitcher />
           <button
             type="button"
@@ -173,7 +173,7 @@ export default function BuyerHeader({
 
       {/* Mobile Drawer */}
       {open && (
-        <div className="xl:hidden border-t border-slate-200/80 bg-slate-50/95 px-4 pb-5 shadow-lg">
+        <div className="2xl:hidden border-t border-slate-200/80 bg-slate-50/95 px-4 pb-5 shadow-lg">
           <div className="space-y-1.5 pt-4">
             {navItems.map((item) => {
               const active = isActive(item.href);
