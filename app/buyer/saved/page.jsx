@@ -3,6 +3,8 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { DEFAULT_BUYER_PRODUCE, DEFAULT_BUYER_PROFILE } from "@/lib/services/buyer-defaults";
+import { createClient } from "@/lib/supabase/client";
+import { submitBuyerOffer } from "@/lib/services/offers";
 
 import BuyerHeader from "@/components/buyer/BuyerHeader";
 import BuyerDock from "@/components/buyer/BuyerDock";
@@ -79,13 +81,10 @@ export default function BuyerWishlistPage() {
     showToast("Removed from Wishlist");
   }, [showToast]);
 
-  const handleOrderPlaced = useCallback((order) => {
-    try {
-      const existing = JSON.parse(localStorage.getItem("krishi_buyer_orders") || "[]");
-      const updated = [order, ...existing];
-      localStorage.setItem("krishi_buyer_orders", JSON.stringify(updated));
-    } catch {}
-    showToast(`Order #${order.id} sent to farmer successfully!`);
+  const handleOrderPlaced = useCallback(async (order) => {
+    const supabase = createClient();
+    await submitBuyerOffer(supabase, order);
+    showToast(`Your offer for ${order.crop} was sent to ${order.farmer}.`);
   }, [showToast]);
 
   // Saved produce objects

@@ -83,7 +83,7 @@ export default function BuyerOrderModal({
       onClose();
     } catch (err) {
       console.error("Order submit failed:", err);
-      setError("Failed to submit order. Please try again.");
+      setError(err?.message || "Failed to send the offer. Please try again.");
     } finally {
       setSubmitting(false);
     }

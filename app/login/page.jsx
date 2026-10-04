@@ -22,10 +22,8 @@ export default function LoginPage() {
         const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user;
         if (user) {
-          const metadataRole = user.user_metadata?.role;
-          const role = ["admin", "farmer", "buyer"].includes(metadataRole)
-            ? metadataRole
-            : (await getUserProfile(supabase, user.id))?.role || "user";
+          const profile = await getUserProfile(supabase, user.id);
+          const role = profile?.role || user.user_metadata?.role || "user";
           setCurrentSession({
             email: user.email,
             role,
@@ -80,21 +78,21 @@ export default function LoginPage() {
       return;
     }
 
-    const metadataRole = data.user.user_metadata?.role;
-    if (metadataRole === "farmer" || metadataRole === "buyer") {
-      router.replace(metadataRole === "farmer" ? "/farmer" : "/buyer");
-      return;
-    }
-
-    // Resolve profile via robust service layer
     try {
       const profile = await getUserProfile(supabase, data.user.id);
+      let role = profile?.role;
 
-      if (!profile || !profile.role) {
+      if (!role) {
         const metadata = data.user.user_metadata || {};
-        const role = metadata.role === "admin" ? "admin" : metadata.role === "buyer" ? "buyer" : "farmer";
+        role = ["admin", "farmer", "buyer"].includes(metadata.role)
+          ? metadata.role
+          : null;
+
+        if (!role) {
+          throw new Error("Your account role is missing or invalid. Please contact support.");
+        }
         
-        await supabase.from("profiles").upsert({
+        const { error: profileError } = await supabase.from("profiles").upsert({
           profile_id: data.user.id,
           full_name: metadata.full_name || "KrishiSetu user",
           email: data.user.email,
@@ -106,22 +104,14 @@ export default function LoginPage() {
           state: metadata.state || null,
           pincode: metadata.pincode || null,
         });
-
-        router.replace(role === "admin" ? "/admin" : role === "farmer" ? "/farmer" : "/buyer");
-        return;
+        if (profileError) throw profileError;
       }
 
-      router.replace(
-        profile.role === "admin"
-          ? "/admin"
-          : profile.role === "farmer"
-          ? "/farmer"
-          : "/buyer"
-      );
+      router.replace(role === "admin" ? "/admin" : role === "farmer" ? "/farmer" : "/buyer");
     } catch (profileErr) {
       console.error("Profile resolution error:", profileErr);
-      const fallbackRole = data.user.user_metadata?.role || "farmer";
-      router.replace(fallbackRole === "admin" ? "/admin" : fallbackRole === "farmer" ? "/farmer" : "/buyer");
+      setErrorMessage(profileErr?.message || "Your account is signed in, but its role could not be verified. Please try again.");
+      setLoading(false);
     }
   }
 

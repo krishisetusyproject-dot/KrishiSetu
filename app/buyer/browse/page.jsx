@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProfile } from "@/lib/services/profiles";
 import { getActiveListings } from "@/lib/services/listings";
+import { submitBuyerOffer } from "@/lib/services/offers";
 import {
   DEFAULT_BUYER_PROFILE,
   DEFAULT_BUYER_PRODUCE,
@@ -127,13 +128,10 @@ function BrowseContent() {
     });
   }, [showToast]);
 
-  const handleOrderPlaced = useCallback((order) => {
-    try {
-      const existing = JSON.parse(localStorage.getItem("krishi_buyer_orders") || "[]");
-      const updated = [order, ...existing];
-      localStorage.setItem("krishi_buyer_orders", JSON.stringify(updated));
-    } catch {}
-    showToast(`Order request #${order.id} sent to ${order.farmer}!`);
+  const handleOrderPlaced = useCallback(async (order) => {
+    const supabase = createClient();
+    await submitBuyerOffer(supabase, order);
+    showToast(`Your offer for ${order.crop} was sent to ${order.farmer}.`);
   }, [showToast]);
 
   const resetFilters = useCallback(() => {

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProfile } from "@/lib/services/profiles";
 import { getFarmerOffers, acceptOffer, rejectOffer } from "@/lib/services/offers";
-import { DEFAULT_OFFERS, DEFAULT_FARMER_PROFILE } from "@/lib/services/farmer-defaults";
+import { DEFAULT_FARMER_PROFILE } from "@/lib/services/farmer-defaults";
 
 import FarmerHeader from "@/components/farmer/FarmerHeader";
 import EmptyState from "@/components/farmer/EmptyState";
@@ -23,10 +23,12 @@ import {
 export default function BuyerOffersPage() {
   const router = useRouter();
   const [profile, setProfile] = useState(DEFAULT_FARMER_PROFILE);
-  const [offers, setOffers] = useState(DEFAULT_OFFERS || []);
+  const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [actionId, setActionId] = useState(null);
   const [successToast, setSuccessToast] = useState("");
+  const [actionError, setActionError] = useState("");
 
   useEffect(() => {
     async function loadOffers() {
@@ -42,7 +44,7 @@ export default function BuyerOffersPage() {
         // Parallel: both requests fire simultaneously
         const [userProfile, dbOffers] = await Promise.all([
           getUserProfile(supabase, userData.user.id).catch(() => null),
-          getFarmerOffers(supabase, userData.user.id).catch(() => []),
+          getFarmerOffers(supabase, userData.user.id),
         ]);
 
         if (userProfile) setProfile(userProfile);
@@ -67,12 +69,11 @@ export default function BuyerOffersPage() {
             }),
           }));
           setOffers(normalized);
-        } else {
-          setOffers(DEFAULT_OFFERS);
-        }
+        } else setOffers([]);
       } catch (err) {
         console.error("Error loading offers:", err);
-        setOffers(DEFAULT_OFFERS);
+        setOffers([]);
+        setLoadError(err?.message || "Please try again.");
       } finally {
         setLoading(false);
       }
@@ -89,12 +90,13 @@ export default function BuyerOffersPage() {
 
   const handleAccept = useCallback(async (offerId) => {
     setActionId(offerId);
+    setActionError("");
     try {
       const supabase = createClient();
       const { data: userData } = await supabase.auth.getUser();
-      if (userData?.user?.id) {
-        await acceptOffer(supabase, offerId, userData.user.id).catch(() => null);
-      }
+      if (!userData?.user?.id) throw new Error("Please sign in again to accept this offer.");
+
+      await acceptOffer(supabase, offerId, userData.user.id);
 
       setOffers((prev) =>
         prev.map((o) => (o.id === offerId ? { ...o, status: "accepted" } : o))
@@ -106,8 +108,7 @@ export default function BuyerOffersPage() {
       setTimeout(() => setSuccessToast(""), 5000);
     } catch (err) {
       console.error(err);
-      setSuccessToast("Offer accepted in demo mode.");
-      setTimeout(() => setSuccessToast(""), 4000);
+      setActionError(err?.message || "Could not accept this offer. Please try again.");
     } finally {
       setActionId(null);
     }
@@ -115,9 +116,10 @@ export default function BuyerOffersPage() {
 
   const handleReject = useCallback(async (offerId) => {
     setActionId(offerId);
+    setActionError("");
     try {
       const supabase = createClient();
-      await rejectOffer(supabase, offerId).catch(() => null);
+      await rejectOffer(supabase, offerId);
 
       setOffers((prev) =>
         prev.map((o) => (o.id === offerId ? { ...o, status: "rejected" } : o))
@@ -127,6 +129,7 @@ export default function BuyerOffersPage() {
       setTimeout(() => setSuccessToast(""), 4000);
     } catch (err) {
       console.error(err);
+      setActionError(err?.message || "Could not decline this offer. Please try again.");
     } finally {
       setActionId(null);
     }
@@ -144,6 +147,17 @@ export default function BuyerOffersPage() {
       />
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {loadError && (
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            Could not load buyer offers: {loadError}
+          </div>
+        )}
+        {actionError && (
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            {actionError}
+          </div>
+        )}
+
         {/* Success Toast */}
         {successToast && (
           <div className="mb-6 flex items-center gap-2 rounded-2xl bg-emerald-900 text-white p-4 shadow-xl border border-emerald-700 animate-in fade-in duration-300">
@@ -175,7 +189,11 @@ export default function BuyerOffersPage() {
         </div>
 
         {/* Offers Grid */}
-        {safeOffers.length > 0 ? (
+        {loading ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+            Loading buyer offers...
+          </div>
+        ) : safeOffers.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2">
             {safeOffers.map((offer) => {
               const priceDiff = offer.offered_price - (offer.asking_price || 0);

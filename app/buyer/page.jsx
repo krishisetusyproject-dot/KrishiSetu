@@ -6,7 +6,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProfile } from "@/lib/services/profiles";
 import { getActiveListings } from "@/lib/services/listings";
-import { getBuyerOrders, createBuyerOrder, cancelBuyerOrder } from "@/lib/services/orders";
+import { getBuyerOrders } from "@/lib/services/orders";
+import { submitBuyerOffer } from "@/lib/services/offers";
 import {
   DEFAULT_BUYER_PROFILE,
   DEFAULT_BUYER_PRODUCE,
@@ -157,37 +158,10 @@ export default function BuyerDashboardPage() {
 
   // Submit Offer / Order
   const handleSubmitOrder = useCallback(async (newOrder) => {
-    const updated = [newOrder, ...orders];
-    setOrders(updated);
-    try {
-      localStorage.setItem("krishi_buyer_orders", JSON.stringify(updated));
-    } catch (e) {
-      console.warn(e);
-    }
-
-    showToast(`Order request #${newOrder.id} for ${newOrder.crop} submitted! Escrow allocated.`);
-
-    // Try live Supabase insert
-    try {
-      const supabase = createClient();
-      const { data: userData } = await supabase.auth.getUser();
-      if (userData?.user) {
-        await createBuyerOrder(supabase, {
-          buyer_id: userData.user.id,
-          listing_id: newOrder.listing_id,
-          quantity: newOrder.quantity,
-          unit_price: newOrder.price,
-          total_amount: newOrder.total_amount,
-          status: "pending",
-          pickup_location: newOrder.pickup_location,
-          pickup_date: newOrder.pickup_date,
-          buyer_notes: newOrder.notes,
-        });
-      }
-    } catch (err) {
-      console.warn("Supabase order insert skipped:", err);
-    }
-  }, [orders, showToast]);
+    const supabase = createClient();
+    await submitBuyerOffer(supabase, newOrder);
+    showToast(`Your offer for ${newOrder.crop} was sent to ${newOrder.farmer}.`);
+  }, [showToast]);
 
   // Handle Search Submission
   const handleSearchSubmit = useCallback((e) => {
