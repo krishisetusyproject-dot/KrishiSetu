@@ -1,14 +1,12 @@
 "use client";
 
-import { Plus, TrendingUp, ShieldCheck, CheckCircle2, Award, MapPin } from "lucide-react";
+import { Plus, TrendingUp, ShieldCheck, MapPin } from "lucide-react";
 
 export default function WelcomeHeader({
   name = "Ramesh Patil",
   farmName = "KrishiKalyan Farms",
   acreage = "8.5 Acres",
   location = "Nashik, Maharashtra",
-  kisanId = "MH-NSK-88410",
-  pmKisanVerified = true,
   onSellProduce,
   onViewMarketPrices,
 }) {
@@ -22,28 +20,12 @@ export default function WelcomeHeader({
               <MapPin className="h-3.5 w-3.5 text-amber-200/80" />
               {location}
             </span>
-            {kisanId && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-900/90 px-2.5 py-0.5 text-[11px] font-mono font-semibold text-amber-200 border border-emerald-800">
-                Kisan ID: {kisanId}
-              </span>
-            )}
-            {pmKisanVerified && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-900/90 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-300 border border-emerald-800">
-                <CheckCircle2 className="h-3 w-3 text-emerald-400" />
-                PM-Kisan Verified
-              </span>
-            )}
           </div>
 
           {/* Heading */}
           <h1 className="mt-3 text-2xl sm:text-4xl font-bold tracking-tight text-amber-100">
             Welcome back, {name}
           </h1>
-
-          {/* Subheading / Farm Info */}
-          <p className="mt-2 text-sm sm:text-base font-medium text-emerald-200/90">
-            {farmName} • <span className="text-amber-100/90">{acreage} Landholding</span>
-          </p>
 
           <p className="mt-3 max-w-xl text-xs sm:text-sm leading-relaxed text-amber-100/80">
             List your harvest for verified farmgate collection, review transparent APMC mandi benchmarks, and connect directly with institutional buyers with zero intermediary cut.
