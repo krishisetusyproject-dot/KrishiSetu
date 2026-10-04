@@ -103,12 +103,14 @@ export default function BuyerOffersPage() {
       );
 
       setSuccessToast(
-        "Offer accepted! Order created under 'Orders & Pickup' with Escrow locked."
+        "Offer accepted and the confirmed order is ready under 'Orders & Pickup'."
       );
       setTimeout(() => setSuccessToast(""), 5000);
+      return true;
     } catch (err) {
       console.error(err);
       setActionError(err?.message || "Could not accept this offer. Please try again.");
+      return false;
     } finally {
       setActionId(null);
     }
@@ -314,10 +316,12 @@ export default function BuyerOffersPage() {
                       </div>
                     ) : offer.status === "accepted" ? (
                       <button
-                        onClick={() => router.push("/farmer/orders")}
+                        onClick={async () => {
+                          if (await handleAccept(offer.id)) router.push("/farmer/orders");
+                        }}
                         className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold text-xs py-2.5 hover:bg-emerald-100 transition-colors"
                       >
-                        <span>View Confirmed Order in Orders & Pickup</span>
+                        <span>Complete Order Setup / View Order</span>
                         <ArrowRight className="h-3.5 w-3.5" />
                       </button>
                     ) : (
