@@ -46,7 +46,7 @@ export default function FarmerHeader({
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-slate-50/95 backdrop-blur-xl">
-      <div className="mx-auto grid max-w-screen-2xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center px-4 py-3.5 sm:px-6 lg:px-8">
+      <div className="mx-auto grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center px-4 py-3.5 sm:px-6 lg:px-8 2xl:px-10">
         {/* Brand */}
         <Link href="/farmer" className="col-start-1 row-start-1 flex items-center gap-3 group shrink-0">
           <BrandLogo
@@ -58,14 +58,14 @@ export default function FarmerHeader({
         </Link>
 
         {/* Center Nav Links */}
-        <nav className="col-start-2 row-start-1 hidden shrink-0 items-center gap-3 justify-self-center 2xl:flex 2xl:gap-5">
+        <nav className="col-start-2 row-start-1 hidden shrink-0 items-center gap-4 justify-self-center 2xl:flex 2xl:gap-6">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative shrink-0 whitespace-nowrap text-xs sm:text-sm transition flex items-center gap-1.5 pb-1 ${
+                className={`relative shrink-0 whitespace-nowrap text-sm 2xl:text-base transition flex items-center gap-1.5 pb-1 ${
                   active
                     ? "font-bold text-emerald-950 border-b-2 border-emerald-950"
                     : "font-medium text-slate-600 hover:text-emerald-950"
@@ -83,7 +83,7 @@ export default function FarmerHeader({
         </nav>
 
         {/* Right Actions */}
-        <div className="col-start-3 row-start-1 hidden shrink-0 items-center gap-3 justify-self-end 2xl:flex">
+        <div className="col-start-3 row-start-1 hidden shrink-0 items-center gap-4 justify-self-end 2xl:flex">
           <LanguageSwitcher />
 
           {/* User Profile Pill */}
@@ -98,7 +98,7 @@ export default function FarmerHeader({
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-950/10 text-xs font-bold text-emerald-950">
               {initial}
             </div>
-            <span className="text-xs sm:text-sm font-semibold text-slate-800 max-w-[120px] truncate">
+            <span className="text-sm font-semibold text-slate-800 max-w-[140px] truncate">
               {name}
             </span>
           </Link>
