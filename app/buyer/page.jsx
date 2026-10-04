@@ -109,7 +109,7 @@ export default function BuyerDashboardPage() {
             qualityGrade: l.quality_grade || "Grade A",
             harvestDate: "Immediate",
             organic: Boolean(l.organic),
-            imageUrl: l.image_url || null,
+            imageUrl: l.imageUrl || null,
           }));
           setProduceList(mapped);
         }

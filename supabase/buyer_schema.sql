@@ -357,3 +357,36 @@ DROP POLICY IF EXISTS "Users can mark own notifications read" ON public.notifica
 CREATE POLICY "Users can mark own notifications read" ON public.notifications
   FOR UPDATE USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
+
+-- Farmer crop images are stored under the authenticated user's folder.
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'produce-images',
+  'produce-images',
+  true,
+  5242880,
+  ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+)
+ON CONFLICT (id) DO UPDATE
+SET public = EXCLUDED.public,
+    file_size_limit = EXCLUDED.file_size_limit,
+    allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+DROP POLICY IF EXISTS "Public can view produce images" ON storage.objects;
+CREATE POLICY "Public can view produce images" ON storage.objects
+  FOR SELECT TO anon, authenticated
+  USING (bucket_id = 'produce-images');
+
+DROP POLICY IF EXISTS "Farmers can upload own produce images" ON storage.objects;
+CREATE POLICY "Farmers can upload own produce images" ON storage.objects
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    bucket_id = 'produce-images'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+    AND EXISTS (
+      SELECT 1
+      FROM public.profiles p
+      WHERE p.profile_id = auth.uid()
+        AND p.role = 'farmer'
+    )
+  );

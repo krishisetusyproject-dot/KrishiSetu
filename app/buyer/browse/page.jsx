@@ -91,7 +91,7 @@ function BrowseContent() {
             qualityGrade: l.quality_grade || "Grade A",
             harvestDate: "Ready for Pickup",
             organic: Boolean(l.organic),
-            imageUrl: l.image_url || null,
+            imageUrl: l.imageUrl || null,
           }));
           setProduceList(mapped);
         }

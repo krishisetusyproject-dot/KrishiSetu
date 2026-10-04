@@ -119,17 +119,20 @@ export default function SellProduceModal({
 
       if (imageFile) {
         const supabase = createClient();
-        const fileExt = imageFile.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
-        
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Please sign in before uploading a crop image.");
+
+        const fileExt = imageFile.name.split(".").pop();
+        const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+
         const { error: uploadError } = await supabase.storage
-          .from('produce-images')
+          .from("produce-images")
           .upload(fileName, imageFile, { upsert: false });
 
         if (uploadError) throw uploadError;
 
         const { data: { publicUrl } } = supabase.storage
-          .from('produce-images')
+          .from("produce-images")
           .getPublicUrl(fileName);
 
         finalForm.imageUrl = publicUrl;
@@ -139,7 +142,7 @@ export default function SellProduceModal({
       onClose();
     } catch (err) {
       console.error(err);
-      setError("Failed to publish produce. If image failed, check bucket permissions.");
+      setError(err?.message || "Failed to publish produce. Please try again.");
     } finally {
       setSaving(false);
     }
