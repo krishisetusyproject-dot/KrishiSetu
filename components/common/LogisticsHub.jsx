@@ -4,7 +4,16 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import Image from "next/image";
 import { getPartnerPlatforms } from "@/lib/services/partners";
 import { createClient } from "@/lib/supabase/client";
-import { Search, ExternalLink, ShieldCheck, Truck, ShoppingCart, Landmark } from "lucide-react";
+import {
+  Search,
+  ExternalLink,
+  ShieldCheck,
+  Truck,
+  ShoppingCart,
+  ShoppingBasket,
+  Landmark,
+  Leaf,
+} from "lucide-react";
 
 const typeIcons = {
   logistics: <Truck className="h-4 w-4 text-sky-600" />,
@@ -16,6 +25,14 @@ const typeLabels = {
   logistics: "Transport & Logistics",
   f2c_platform: "F2C Marketplaces",
   government: "Government Initiatives",
+};
+
+const partnerIcons = {
+  "kisan rath": { Icon: Truck, color: "text-sky-700", background: "bg-sky-50" },
+  "kisansabha": { Icon: Landmark, color: "text-emerald-700", background: "bg-emerald-50" },
+  "porter / fast logistics": { Icon: Truck, color: "text-orange-700", background: "bg-orange-50" },
+  "otipy": { Icon: ShoppingBasket, color: "text-rose-700", background: "bg-rose-50" },
+  "ninjacart": { Icon: Leaf, color: "text-lime-700", background: "bg-lime-50" },
 };
 
 export default function LogisticsHub({ userRole = "farmer" }) {
@@ -97,17 +114,20 @@ export default function LogisticsHub({ userRole = "farmer" }) {
         </div>
       ) : filteredPartners.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPartners.map((partner) => (
+          {filteredPartners.map((partner) => {
+            const visual = partnerIcons[partner.name.toLowerCase()] || {
+              Icon: partner.type === "logistics" ? Truck : ShoppingCart,
+              color: "text-emerald-700",
+              background: "bg-emerald-50",
+            };
+            const PartnerIcon = visual.Icon;
+
+            return (
             <article key={partner.id} className="group relative flex flex-col bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-xs hover:shadow-md hover:border-emerald-200 transition-all">
               <div className="p-6 flex-1 flex flex-col">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="h-12 w-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2">
-                    <img 
-                      src={partner.logo_url} 
-                      alt={partner.name} 
-                      className="w-full h-full object-contain"
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl border border-slate-100 ${visual.background}`}>
+                    <PartnerIcon className={`h-6 w-6 ${visual.color}`} aria-hidden="true" />
                   </div>
                   <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 text-[10px] font-bold text-slate-600 border border-slate-100">
                     {typeIcons[partner.type]} {typeLabels[partner.type]}
@@ -139,7 +159,8 @@ export default function LogisticsHub({ userRole = "farmer" }) {
                 </a>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
