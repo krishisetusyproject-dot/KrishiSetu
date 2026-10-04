@@ -58,7 +58,7 @@ export default function FarmerHeader({
         </Link>
 
         {/* Center Nav Links */}
-        <nav className="col-start-2 row-start-1 hidden shrink-0 items-center gap-4 justify-self-center 2xl:flex 2xl:gap-6">
+        <nav className="col-start-2 row-start-1 hidden shrink-0 items-center gap-4 justify-self-center 2xl:flex 2xl:gap-6 2xl:-translate-x-6">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
